@@ -18,9 +18,11 @@ This file is part of DQ Dynamics.
 
 Contributors to this file:
     Frederico Fernandes Afonso Silva - frederico.silva@ieee.org
+        - Adapted from DQ Robotic's LBR4pVrepRobot class.
+            https://github.com/dqrobotics/cpp-interface-vrep/blob/master/src/dqrobotics/interfaces/vrep/robots/LBR4pVrepRobot.cpp
 */
 
-#include <dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots/LBR4pVrepRobotDynamics.h>
+#include <dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h>
 
 #include <dqrobotics/utils/DQ_Constants.h>
 
@@ -28,7 +30,7 @@ namespace DQ_dynamics
 {
 
 /**
- * @brief Constructor of the LBR4pVrepRobotDynamics class
+ * @brief Constructor of the LBR4pCoppeliaSimLegacyRobot class
  *
  * @param robot_name The name of robot used on the vrep scene.
  * @param vrep_interface_sptr The DQ_VrepInterface smart pointer.
@@ -42,7 +44,7 @@ namespace DQ_dynamics
  *               vi->stop_simulation();
  *               vi->disconnect();
  */
-LBR4pVrepRobotDynamics::LBR4pVrepRobotDynamics(const std::string& robot_name,
+LBR4pCoppeliaSimLegacyRobot::LBR4pCoppeliaSimLegacyRobot(const std::string& robot_name,
                             const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr):
     DQ_SerialVrepRobot("LBR4p",
                        7,
@@ -53,7 +55,7 @@ LBR4pVrepRobotDynamics::LBR4pVrepRobotDynamics(const std::string& robot_name,
 }
 
 
-DQ_SerialManipulatorDH LBR4pVrepRobotDynamics::kinematics()
+DQ_SerialManipulatorDH LBR4pCoppeliaSimLegacyRobot::kinematics()
 {
     const double pi2 = pi/2.0;
 

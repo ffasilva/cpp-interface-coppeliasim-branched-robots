@@ -18,6 +18,8 @@ This file is part of DQ Dynamics.
 
 Contributors to this file:
     Frederico Fernandes Afonso Silva - frederico.silva@ieee.org
+        - Adapted from DQ Robotic's LBR4pVrepRobot class.
+            https://github.com/dqrobotics/cpp-interface-vrep/blob/master/include/dqrobotics/interfaces/vrep/robots/LBR4pVrepRobot.h
 */
 
 #pragma once
@@ -28,14 +30,14 @@ Contributors to this file:
 namespace DQ_dynamics
 {
 
-class LBR4pVrepRobotDynamics: public DQ_SerialVrepRobot
+class LBR4pCoppeliaSimLegacyRobot: public DQ_SerialVrepRobot
 {
 public:
-    // LBR4pVrepRobotDynamics() = delete;
-    LBR4pVrepRobotDynamics(const std::string& robot_name,
+    // LBR4pCoppeliaSimLegacyRobot() = delete;
+    LBR4pCoppeliaSimLegacyRobot(const std::string& robot_name,
                            const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
-    // virtual ~LBR4pVrepRobotDynamics() = default;
-    // ~LBR4pVrepRobotDynamics();
+    // virtual ~LBR4pCoppeliaSimLegacyRobot() = default;
+    // ~LBR4pCoppeliaSimLegacyRobot();
 
     DQ_SerialManipulatorDH kinematics();
 };

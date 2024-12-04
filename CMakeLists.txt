@@ -44,7 +44,7 @@ endif()
 ADD_LIBRARY(dmc-interface-coppeliasim SHARED
     src/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
 
-    src/interfaces/coppeliasim/legacy_api/robots/LBR4pVrepRobotDynamics.cpp
+    src/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
     )
 
 INSTALL(TARGETS dmc-interface-coppeliasim
@@ -84,7 +84,7 @@ INSTALL(FILES
 
 # robots headers
 INSTALL(FILES
-    include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots/LBR4pVrepRobotDynamics.h
+    include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h
 
     DESTINATION "include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots")
 
@@ -100,7 +100,7 @@ INSTALL(FILES
 
 # robots folder
 INSTALL(FILES
-    src/interfaces/coppeliasim/legacy_api/robots/LBR4pVrepRobotDynamics.cpp
+    src/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
 
     DESTINATION "src/interfaces/coppeliasim/legacy_api/robots")
 
