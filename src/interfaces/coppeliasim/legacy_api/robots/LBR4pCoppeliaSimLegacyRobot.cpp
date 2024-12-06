@@ -24,6 +24,8 @@ Contributors to this file:
 
 #include <dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h>
 
+#include<dqdynamics/robots/LBR4pRobot.h>
+
 #include <dqrobotics/utils/DQ_Constants.h>
 
 namespace DQ_dynamics
@@ -32,26 +34,22 @@ namespace DQ_dynamics
 /**
  * @brief Constructor of the LBR4pCoppeliaSimLegacyRobot class
  *
- * @param robot_name The name of robot used on the vrep scene.
+ * @param robot_name The name of robot used on the CoppeliaSim scene.
  * @param vrep_interface_sptr The DQ_VrepInterface smart pointer.
  *
  *               Example:
  *               auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
  *               vi->connect(19997,100,5);
  *               vi->start_simulation();
- *               LBR4pVrepRobot lbr4p_vreprobot("LBR4p", vi);
- *               auto q = lbr4p_vreprobot.get_q_from_vrep();
+ *               LBR4pVrepRobot lbr4p_coppeliasim_robot("LBR4p", vi);
+ *               auto q = lbr4p_coppeliasim_robot.get_q_from_vrep();
  *               vi->stop_simulation();
  *               vi->disconnect();
  */
 LBR4pCoppeliaSimLegacyRobot::LBR4pCoppeliaSimLegacyRobot(const std::string& robot_name,
                             const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr):
-    DQ_SerialVrepRobot("LBR4p",
-                       7,
-                       robot_name,
-                       vrep_interface_sptr)
+    DQ_BranchedCoppeliaSimLegacyRobot("LBR4p", 7, robot_name, vrep_interface_sptr)
 {
-
 }
 
 
@@ -70,6 +68,52 @@ DQ_SerialManipulatorDH LBR4pCoppeliaSimLegacyRobot::kinematics()
     kin.set_base_frame(_get_interface_ptr()->get_object_pose(base_frame_name_));
     kin.set_effector(1+0.5*E_*k_*0.07);
     return kin;
+}
+
+/**
+ * @brief This method constructs an instance of a DQ_SerialManipulatorDynamics.
+ *
+ * @return A DQ_SerialManipulatorDynamics representing a KUKA LBR+ robot.
+ *
+ *  Example:
+ *      Recommended:
+ *          auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
+ *          vi->connect(19997,100,5);
+ *          vi->start_simulation();
+ *          LBR4pCoppeliaSimLegacyRobot lbr4p_coppeliasim_robot("LBR4p", vi);
+ *          DQ_SerialManipulatorDynamics lbr4p_robot =
+ *              lbr4p_coppeliasim_robot.dynamics();
+ *      Advanced:
+ *          auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
+ *          vi->connect(19997,100,5);
+ *          vi->start_simulation();
+ *          LBR4pCoppeliaSimLegacyRobot lbr4p_coppeliasim_robot("LBR4p", vi);
+ *          DQ_SerialManipulatorDynamics lbr4p_robot =
+ *              lbr4p_coppeliasim_robot.dynamics('MyLuaScript');
+ */
+DQ_SerialManipulatorDynamics LBR4pCoppeliaSimLegacyRobot::dynamics()
+{
+    // Create a DQ_SerialManipulatorDynamics object
+    DQ_SerialManipulatorDynamics dyn = LBR4pRobot::dynamics();
+
+    // Set the robot configuration with CoppeliaSim values
+    VectorXd q_read = this->get_configuration_space_positions();
+    VectorXd dq_read = this->get_configuration_space_velocities();
+    VectorXd ddq_read = VectorXd::Zero(7,1);
+
+    dyn.set_configurations(q_read, dq_read, ddq_read);
+
+    // Update base and reference frame with CoppeliaSim values
+    dyn.set_reference_frame(this->vrep_interface_sptr_->get_object_pose(
+                                                            this->base_frame_name_));
+    dyn.set_base_frame(this->vrep_interface_sptr_->get_object_pose(
+                                                            this->base_frame_name_));
+
+    // Update dynamic parameters with CoppeliaSim information
+    auto dyn_sptr = std::make_shared<DQ_SerialManipulatorDynamics>(dyn);
+    this->update_dynamic_parameters(dyn_sptr);
+
+    return dyn;
 }
 
 }//namespace DQ_dynamics

@@ -24,13 +24,16 @@ Contributors to this file:
 
 #pragma once
 
-#include <dqrobotics/interfaces/vrep/DQ_SerialVrepRobot.h>
+#include <dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h>
+
+#include <dqdynamics/robot_modeling/DQ_SerialManipulatorDynamics.h>
+
 #include <dqrobotics/robot_modeling/DQ_SerialManipulatorDH.h>
 
 namespace DQ_dynamics
 {
 
-class LBR4pCoppeliaSimLegacyRobot: public DQ_SerialVrepRobot
+class LBR4pCoppeliaSimLegacyRobot: public DQ_BranchedCoppeliaSimLegacyRobot
 {
 public:
     // LBR4pCoppeliaSimLegacyRobot() = delete;
@@ -40,6 +43,8 @@ public:
     // ~LBR4pCoppeliaSimLegacyRobot();
 
     DQ_SerialManipulatorDH kinematics();
+
+    DQ_SerialManipulatorDynamics dynamics();
 };
 
 }//namespace DQ_dynamics
