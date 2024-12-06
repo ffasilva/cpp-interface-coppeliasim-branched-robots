@@ -22,8 +22,9 @@ Contributors to this file:
 
 #pragma once
 
-#include "dqdynamics/robot_modeling/DQ_BranchedWholeBody.h"
 #include <dqdynamics/robot_modeling/DQ_Dynamics.h>
+#include <dqdynamics/robot_modeling/DQ_SerialManipulatorDynamics.h>
+#include <dqdynamics/robot_modeling/DQ_BranchedWholeBody.h>
 
 #include <dqrobotics/interfaces/vrep/DQ_SerialVrepRobot.h>
 
@@ -35,18 +36,20 @@ class DQ_BranchedCoppeliaSimLegacyRobot: public DQ_SerialVrepRobot
 protected:
     std::vector<std::string> link_names_;
 
-    // void update_base_dynamic_parameters(std::shared_ptr<DQ_Dynamics> robot_dynamics);
-    // void update_branch_dynamic_parameters(std::shared_ptr<DQ_Dynamics> robot_dynamics,
-    //                                       const int&starting_name_index);
-    // void update_dynamic_parameters(std::shared_ptr<DQ_BranchedWholeBody> robot_dynamics,
-    //                                const int&starting_name_index = 1);
+    void update_base_dynamic_parameters(std::shared_ptr<DQ_Dynamics> robot_dynamics);
+    void update_branch_dynamic_parameters(std::shared_ptr<DQ_Dynamics> robot_dynamics,
+                                          const int&starting_name_index);
+    void update_dynamic_parameters(std::shared_ptr<DQ_SerialManipulatorDynamics> robot_dynamics,
+                                   const int&starting_name_index = 0);
+    void update_dynamic_parameters(std::shared_ptr<DQ_BranchedWholeBody> robot_dynamics,
+                                   const int&starting_name_index = 0);
 public:
-    // DQ_BranchedCoppeliaSimLegacyRobot() = delete;
+    DQ_BranchedCoppeliaSimLegacyRobot() = delete;
     DQ_BranchedCoppeliaSimLegacyRobot(const std::string& base_robot_name,
                             const int& robot_dof,
                             const std::string& robot_name,
                             const std::shared_ptr<DQ_VrepInterface>& vrep_interface_sptr);
-    // virtual ~DQ_BranchedCoppeliaSimLegacyRobot() = default;
+    virtual ~DQ_BranchedCoppeliaSimLegacyRobot() = default;
     // ~DQ_BranchedCoppeliaSimLegacyRobot();
 };
 
