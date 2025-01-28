@@ -5,7 +5,7 @@ if(WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
-project(dmc-interface-coppeliasim)
+project(dqdynamics-interface-coppeliasim)
 set (CMAKE_CXX_STANDARD 11)
 
 INCLUDE_DIRECTORIES(include)
@@ -38,10 +38,14 @@ endif()
 # DEFINE AND INSTALL LIBRARY AND INCLUDE FOLDER
 ################################################################
 
-ADD_LIBRARY(dmc-interface-coppeliasim SHARED
-    src/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
+ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
+    src/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
 
-    src/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
+
+    src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
+
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
     )
 
 # Links with dqrobotics, otherwise Qt returns "Undefined symbols for architecture arm64" on Apple silicon
@@ -51,42 +55,66 @@ if(APPLE)
     )
 endif()
 
-INSTALL(TARGETS dmc-interface-coppeliasim
+INSTALL(TARGETS dqdynamics-interface-coppeliasim
 # https://stackoverflow.com/questions/21592361/cmake-install-is-not-installing-libraries-on-windows
     RUNTIME DESTINATION "bin"
     LIBRARY DESTINATION "lib"
     ARCHIVE DESTINATION "lib"
-    PUBLIC_HEADER DESTINATION "include/dmc-interface-coppeliasim"
+    PUBLIC_HEADER DESTINATION "include/dqdynamics-interface-coppeliasim"
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
 ################################################################
 # INSTALL HEADERS IN SUBFOLDERS
 ################################################################
 
-# interfaces headers
+# Legacy API interfaces headers
 INSTALL(FILES
-    include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h
+    include/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h
 
-    DESTINATION "include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api")
+    DESTINATION "include/dqdynamics/interfaces/coppeliasim/legacy_api")
 
-# robots headers
+# Legacy API robots headers
 INSTALL(FILES
-    include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h
+    include/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h
 
-    DESTINATION "include/dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/robots")
+    DESTINATION "include/dqdynamics/interfaces/coppeliasim/legacy_api/robots")
+
+# ZMQ interfaces headers
+INSTALL(FILES
+    include/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.h
+
+    DESTINATION "include/dqdynamics/interfaces/coppeliasim/zmq")
+
+# ZMQ robots headers
+INSTALL(FILES
+    include/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.h
+
+    DESTINATION "include/dqdynamics/interfaces/coppeliasim/zmq/robots")
 
 ################################################################
 # INSTALL SOURCE FILES (So that the debugger can find them)
 ################################################################
 
-# base folder
+# Legacy API base folder
 INSTALL(FILES
-    src/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
 
-    DESTINATION "src/interfaces/coppeliasim/legacy_api")
+    DESTINATION "src/dqdynamics/interfaces/coppeliasim/legacy_api")
 
-# robots folder
+# Legacy API robots folder
 INSTALL(FILES
-    src/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
 
-    DESTINATION "src/interfaces/coppeliasim/legacy_api/robots")
+    DESTINATION "src/dqdynamics/interfaces/coppeliasim/legacy_api/robots")
+
+# ZMQ base folder
+INSTALL(FILES
+    src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
+
+    DESTINATION "src/dqdynamics/interfaces/coppeliasim/zmq")
+
+# ZMQ robots folder
+INSTALL(FILES
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
+
+    DESTINATION "src/dqdynamics/interfaces/coppeliasim/zmq/robots")
