@@ -189,6 +189,15 @@ DQ_BranchedCoppeliaSimZMQRobot::DQ_BranchedCoppeliaSimZMQRobot(
 }
 
 /**
+ * @brief Returns the time robot's link names.
+ * @return A vector of strings representing the robot's link names.
+ */
+std::vector<std::string> DQ_BranchedCoppeliaSimZMQRobot::get_link_names() const
+{
+    return link_names_;
+}
+
+/**
  * @brief Sets the robot's joint mode and joint control mode.
  *
  * @param joint_mode A valid JOINT_MODE.

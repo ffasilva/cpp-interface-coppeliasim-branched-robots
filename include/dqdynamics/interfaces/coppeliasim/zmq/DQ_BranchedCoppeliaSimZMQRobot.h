@@ -50,6 +50,8 @@ public:
         const std::shared_ptr<DQ_CoppeliaSimInterfaceZMQExperimental>& interface_sptr);
     virtual ~DQ_BranchedCoppeliaSimZMQRobot() = default;
 
+    std::vector<std::string> get_link_names() const;
+
     void set_joint_operation_modes(
         const DQ_CoppeliaSimInterfaceZMQExperimental::JOINT_MODE& joint_mode,
         const DQ_CoppeliaSimInterfaceZMQExperimental::JOINT_CONTROL_MODE& joint_control_mode);
