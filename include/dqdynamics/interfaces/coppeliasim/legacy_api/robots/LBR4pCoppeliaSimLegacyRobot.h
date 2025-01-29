@@ -24,7 +24,7 @@ Contributors to this file:
 
 #pragma once
 
-#include <dmc-interface-coppeliasim/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h>
+#include <dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h>
 
 #include <dqdynamics/robot_modeling/DQ_SerialManipulatorDynamics.h>
 
