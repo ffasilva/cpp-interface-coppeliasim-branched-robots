@@ -37,14 +37,14 @@ namespace DQ_dynamics
  * @param robot_name The name of robot used on the CoppeliaSim scene.
  * @param vrep_interface_sptr The DQ_VrepInterface smart pointer.
  *
- *               Example:
- *               auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
- *               vi->connect(19997,100,5);
- *               vi->start_simulation();
- *               LBR4pVrepRobot lbr4p_coppeliasim_robot("LBR4p", vi);
- *               auto q = lbr4p_coppeliasim_robot.get_q_from_vrep();
- *               vi->stop_simulation();
- *               vi->disconnect();
+ *  Example:
+ *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *          vi->connect();
+ *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
+ *                                      "/LBR4p");
+ *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
+ *          auto q = lbr4p_coppeliasim_robot.get_joint_positions();
+ *          vi->stop_simulation();
  */
 LBR4pCoppeliaSimZMQRobot::LBR4pCoppeliaSimZMQRobot(
     const std::string& robot_name,
@@ -53,7 +53,29 @@ LBR4pCoppeliaSimZMQRobot::LBR4pCoppeliaSimZMQRobot(
 {
 }
 
-
+/**
+ * @brief This method constructs an instance of a DQ_SerialManipulatorDH.
+ *
+ * @return A DQ_SerialManipulatorDH representing a KUKA LBR+ robot.
+ *
+ *  Example:
+ *      Recommended:
+ *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *          vi->connect();
+ *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
+ *                                      "/LBR4p");
+ *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
+ *          DQ_SerialManipulatorDH lbr4p_robot =
+ *              lbr4p_coppeliasim_robot.kinematics();
+ *      Advanced:
+ *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *          vi->connect();
+ *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
+ *                                      "/LBR4p");
+ *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
+ *          DQ_SerialManipulatorDH lbr4p_robot =
+ *              lbr4p_coppeliasim_robot.kinematics('MyLuaScript');
+ */
 DQ_SerialManipulatorDH LBR4pCoppeliaSimZMQRobot::kinematics()
 {
     // Create a DQ_SerialManipulatorDH object
@@ -75,17 +97,19 @@ DQ_SerialManipulatorDH LBR4pCoppeliaSimZMQRobot::kinematics()
  *
  *  Example:
  *      Recommended:
- *          auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
- *          vi->connect(19997,100,5);
- *          vi->start_simulation();
- *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("LBR4p", vi);
+ *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *          vi->connect();
+ *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
+ *                                      "/LBR4p");
+ *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
  *          DQ_SerialManipulatorDynamics lbr4p_robot =
  *              lbr4p_coppeliasim_robot.dynamics();
  *      Advanced:
- *          auto vi = std::make_shared<DQ_VrepInterface>(DQ_VrepInterface());
- *          vi->connect(19997,100,5);
- *          vi->start_simulation();
- *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("LBR4p", vi);
+ *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *          vi->connect();
+ *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
+ *                                      "/LBR4p");
+ *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
  *          DQ_SerialManipulatorDynamics lbr4p_robot =
  *              lbr4p_coppeliasim_robot.dynamics('MyLuaScript');
  */
