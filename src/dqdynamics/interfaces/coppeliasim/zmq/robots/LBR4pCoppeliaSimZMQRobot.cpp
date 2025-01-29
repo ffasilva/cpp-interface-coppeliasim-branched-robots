@@ -40,6 +40,7 @@ namespace DQ_dynamics
  *  Example:
  *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *          vi->connect();
+ *          vi->start_simulation();
  *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
  *                                      "/LBR4p");
  *          LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
@@ -61,11 +62,13 @@ LBR4pCoppeliaSimZMQRobot::LBR4pCoppeliaSimZMQRobot(
  *  Example:
  *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *      vi->connect();
+ *      vi->start_simulation();
  *      vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
  *                                  "/LBR4p");
  *      LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
  *      DQ_SerialManipulatorDH lbr4p_robot =
  *                                  lbr4p_coppeliasim_robot.kinematics();
+ *      vi->stop_simulation();
  */
 DQ_SerialManipulatorDH LBR4pCoppeliaSimZMQRobot::kinematics()
 {
@@ -89,11 +92,13 @@ DQ_SerialManipulatorDH LBR4pCoppeliaSimZMQRobot::kinematics()
  *  Example:
  *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *      vi->connect();
+ *      vi->start_simulation();
  *      vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
  *                                  "/LBR4p");
  *      LBR4pCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
  *      DQ_SerialManipulatorDynamics lbr4p_robot =
  *                                      lbr4p_coppeliasim_robot.dynamics();
+ *      vi->stop_simulation();
  */
 DQ_SerialManipulatorDynamics LBR4pCoppeliaSimZMQRobot::dynamics()
 {
