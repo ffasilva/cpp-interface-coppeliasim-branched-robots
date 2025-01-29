@@ -56,15 +56,10 @@ LBR4pCoppeliaSimZMQRobot::LBR4pCoppeliaSimZMQRobot(
 
 DQ_SerialManipulatorDH LBR4pCoppeliaSimZMQRobot::kinematics()
 {
-    const double pi2 = pi/2.0;
+    // Create a DQ_SerialManipulatorDH object
+    DQ_SerialManipulatorDH kin = LBR4pRobot::kinematics();
 
-    Matrix<double,5,7> dh(5,7);
-    dh <<  0,     0,     0,   0,   0,    0,   0,
-            0.200, 0,     0.4, 0,   0.39, 0,   0,
-            0,     0,     0,   0,   0,    0,   0,
-            pi2,   -pi2,  pi2,-pi2, pi2, -pi2, 0,
-            0, 0, 0, 0, 0, 0, 0;
-    DQ_SerialManipulatorDH kin(dh);
+    // Update base and reference frame with CoppeliaSim values
     kin.set_reference_frame(this->_get_interface_sptr()->get_object_pose(
                                                             this->base_frame_name_));
     kin.set_base_frame(this->_get_interface_sptr()->get_object_pose(
