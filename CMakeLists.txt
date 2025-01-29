@@ -53,12 +53,13 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
     )
 
-# Links with dqrobotics, otherwise Qt returns "Undefined symbols for architecture arm64" on Apple silicon
-if(APPLE)
+# Links with required libraries
+if(UNIX)
     target_link_libraries(${PROJECT_NAME}
+        dqdynamics
+
         dqrobotics
         dqrobotics-interface-coppeliasim-zmq
-        dqdynamics
     )
 endif()
 
