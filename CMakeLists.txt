@@ -39,9 +39,9 @@ endif()
 ################################################################
 
 ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
-    src/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
+    # src/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
 
-    src/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
+    # src/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
 
     src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
 
@@ -67,17 +67,17 @@ INSTALL(TARGETS dqdynamics-interface-coppeliasim
 # INSTALL HEADERS IN SUBFOLDERS
 ################################################################
 
-# Legacy API interfaces headers
-INSTALL(FILES
-    include/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h
+# # Legacy API interfaces headers
+# INSTALL(FILES
+#     include/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.h
 
-    DESTINATION "include/dqdynamics/interfaces/coppeliasim/legacy_api")
+#     DESTINATION "include/dqdynamics/interfaces/coppeliasim/legacy_api")
 
-# Legacy API robots headers
-INSTALL(FILES
-    include/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h
+# # Legacy API robots headers
+# INSTALL(FILES
+#     include/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.h
 
-    DESTINATION "include/dqdynamics/interfaces/coppeliasim/legacy_api/robots")
+#     DESTINATION "include/dqdynamics/interfaces/coppeliasim/legacy_api/robots")
 
 # ZMQ interfaces headers
 INSTALL(FILES
@@ -95,17 +95,17 @@ INSTALL(FILES
 # INSTALL SOURCE FILES (So that the debugger can find them)
 ################################################################
 
-# Legacy API base folder
-INSTALL(FILES
-    src/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
+# # Legacy API base folder
+# INSTALL(FILES
+#     src/dqdynamics/interfaces/coppeliasim/legacy_api/DQ_BranchedCoppeliaSimLegacyRobot.cpp
 
-    DESTINATION "src/dqdynamics/interfaces/coppeliasim/legacy_api")
+#     DESTINATION "src/dqdynamics/interfaces/coppeliasim/legacy_api")
 
-# Legacy API robots folder
-INSTALL(FILES
-    src/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
+# # Legacy API robots folder
+# INSTALL(FILES
+#     src/dqdynamics/interfaces/coppeliasim/legacy_api/robots/LBR4pCoppeliaSimLegacyRobot.cpp
 
-    DESTINATION "src/dqdynamics/interfaces/coppeliasim/legacy_api/robots")
+#     DESTINATION "src/dqdynamics/interfaces/coppeliasim/legacy_api/robots")
 
 # ZMQ base folder
 INSTALL(FILES
