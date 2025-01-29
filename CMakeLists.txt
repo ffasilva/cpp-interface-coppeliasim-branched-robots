@@ -57,6 +57,8 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
 if(APPLE)
     target_link_libraries(${PROJECT_NAME}
         dqrobotics
+        dqrobotics-interface-coppeliasim-zmq
+        dqdynamics
     )
 endif()
 
