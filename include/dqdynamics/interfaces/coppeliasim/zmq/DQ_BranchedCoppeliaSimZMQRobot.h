@@ -29,6 +29,8 @@ Contributors to this file:
 #include <dqrobotics/interfaces/coppeliasim/DQ_CoppeliaSimInterfaceZMQExperimental.h>
 #include <dqrobotics/interfaces/coppeliasim/DQ_CoppeliaSimRobotZMQ.h>
 
+#include<memory>
+
 namespace DQ_dynamics
 {
 
@@ -37,11 +39,19 @@ class DQ_BranchedCoppeliaSimZMQRobot: public DQ_robotics::DQ_CoppeliaSimRobotZMQ
 protected:
     std::vector<std::string> link_names_;
 
-    void update_base_dynamic_parameters(std::shared_ptr<DQ_Dynamics> robot_dynamics);
-    void update_branch_dynamic_parameters(std::shared_ptr<DQ_Dynamics> robot_dynamics,
-                                          const int&starting_name_index);
-    void update_dynamic_parameters(std::shared_ptr<DQ_SerialManipulatorDynamics> robot_dynamics,
-                                   const int&starting_name_index = 0);
+    std::tuple<VectorXd,
+               VectorXdq,
+               std::vector<Matrix3d>> update_base_dynamic_parameters();
+    std::tuple<VectorXd,
+               VectorXdq,
+               std::vector<Matrix3d>> update_branch_dynamic_parameters(
+                                        std::shared_ptr<DQ_Dynamics> robot_dynamics,
+                                        const int&starting_name_index);
+    std::tuple<VectorXd,
+               VectorXdq,
+               std::vector<Matrix3d>> update_dynamic_parameters(
+                        std::shared_ptr<DQ_SerialManipulatorDynamics> robot_dynamics,
+                        const int&starting_name_index = 0);
     void update_dynamic_parameters(std::shared_ptr<DQ_BranchedWholeBody> robot_dynamics,
                                    const int&starting_name_index = 0);
 public:

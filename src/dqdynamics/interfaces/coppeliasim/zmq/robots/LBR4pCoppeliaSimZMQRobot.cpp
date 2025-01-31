@@ -113,15 +113,25 @@ DQ_SerialManipulatorDynamics LBR4pCoppeliaSimZMQRobot::dynamics()
     dyn.set_configurations(q_read, dq_read, ddq_read);
 
     // Update base and reference frame with CoppeliaSim values
-    this->_get_interface_sptr()->get_object_pose(this->base_frame_name_);
-    dyn.set_reference_frame(this->_get_interface_sptr()->get_object_pose(
-                                                            this->base_frame_name_));
-    dyn.set_base_frame(this->_get_interface_sptr()->get_object_pose(
-                                                            this->base_frame_name_));
+    const DQ& base_frame = this->_get_interface_sptr()->get_object_pose(
+        this->base_frame_name_);
+    dyn.set_reference_frame(base_frame);
+    dyn.set_base_frame(base_frame);
 
     // Update dynamic parameters with CoppeliaSim information
     auto dyn_sptr = std::make_shared<DQ_SerialManipulatorDynamics>(dyn);
-    this->update_dynamic_parameters(dyn_sptr);
+
+    const int& dim_configuration_space = dyn.get_dim_configuration_space();
+    VectorXd masses = VectorXd::Zero(dim_configuration_space, 1);
+    VectorXdq position_CoMs = VectorXdq::Zero(dim_configuration_space, 1);
+    std::vector<Matrix3d> inertia_tensors;
+
+    std::tie(masses, position_CoMs, inertia_tensors) = this->
+                                                update_dynamic_parameters(dyn_sptr);
+
+    dyn.set_masses(masses);
+    dyn.set_position_CoMs(position_CoMs);
+    dyn.set_inertia_tensors(inertia_tensors);
 
     return dyn;
 }
