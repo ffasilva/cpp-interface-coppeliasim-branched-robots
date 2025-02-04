@@ -32,8 +32,6 @@ Contributors to this file:
 #include <eigen3/Eigen/Dense>
 #endif
 
-#include<dqrobotics/DQ.h>
-
 using namespace Eigen;
 
 namespace DQ_dynamics
@@ -41,9 +39,23 @@ namespace DQ_dynamics
 
 class NumericalDifferentiation
 {
+private:
+    double sampling_time_ = 0.01;
+    double h2_ = 0.04;
+    int h2_scale_ = 4; // recommended: 2, 4, 6, 8
+    double initial_value_ = 0.0;
+    int extrapol_ = 2;
+
+    double diff_sffd_richardson_(const VectorXd& q_joint);
 public:
     NumericalDifferentiation() = delete;
+    NumericalDifferentiation(const double& sampling_time);
     virtual ~NumericalDifferentiation() = default;
+
+    void set_initial_value(const double& initial_value);
+    void set_h2_scale(const int& h2_scale);
+
+    VectorXd vector_differentiation(const MatrixXd& Q_joints);
 };
 
 }//namespace DQ_dynamics

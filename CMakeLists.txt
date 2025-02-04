@@ -51,6 +51,8 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
     src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
+
+    src/dqdynamics/utils/NumericalDifferentiation.cpp
     )
 
 # Links with required libraries
@@ -99,6 +101,12 @@ INSTALL(FILES
 
     DESTINATION "include/dqdynamics/interfaces/coppeliasim/zmq/robots")
 
+# utils headers
+INSTALL(FILES
+    include/dqdynamics/utils/NumericalDifferentiation.h
+
+    DESTINATION "include/dqdynamics/utils")
+
 ################################################################
 # INSTALL SOURCE FILES (So that the debugger can find them)
 ################################################################
@@ -126,3 +134,9 @@ INSTALL(FILES
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
 
     DESTINATION "src/dqdynamics/interfaces/coppeliasim/zmq/robots")
+
+# utils folder
+INSTALL(FILES
+    src/dqdynamics/utils/NumericalDifferentiation.cpp
+
+    DESTINATION "src/dqdynamics/utils")
