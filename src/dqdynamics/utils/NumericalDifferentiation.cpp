@@ -44,9 +44,8 @@ double NumericalDifferentiation::diff_sffd_richardson_(const VectorXd& q_joint)
     h2_ = sampling_time_*h2_scale_;
 
     int n = q_joint.rows();
-    double nn = h2_/sampling_time_;
     double dq_joint;
-    if (n > 2*nn){
+    if (n > 2*h2_scale_){
         double x31 = q_joint(last-2);
         double x21 = q_joint(last-1);
         double x11 = q_joint(last);
@@ -63,7 +62,7 @@ double NumericalDifferentiation::diff_sffd_richardson_(const VectorXd& q_joint)
         double b =  ((pow(ratio_st_h2, extrapol_)) - 1);
 
         dq_joint = a/b;
-    } else {
+    } else { // we use the Euler method when there isn't enough data
         dq_joint = (q_joint(last) - q_joint(last-1))/sampling_time_;
     }
 
@@ -117,12 +116,12 @@ VectorXd NumericalDifferentiation::vector_differentiation(const MatrixXd& Q_join
     int n = Q_joints.cols();
     VectorXd dq_joints = VectorXd::Zero(m);
     if (n == 1){ // there's only one data point for each joint
-        VectorXd vec_initial_value = (initial_value_/sampling_time_)
-                                     *VectorXd::Ones(m,1);
-        dq_joints = Q_joints(all,0) - vec_initial_value;
+        for (int i=0; i<m; i++){
+            dq_joints(i) = (Q_joints(i,0) - initial_value_)/sampling_time_;
+        }
     } else{
         for (int i=0; i<m; i++){ // calculate the time derivative of the ith joint
-            dq_joints(i,0) = diff_sffd_richardson_(Q_joints(i,all).transpose());
+            dq_joints(i) = diff_sffd_richardson_(Q_joints(i,all).transpose());
         }
     }
 
