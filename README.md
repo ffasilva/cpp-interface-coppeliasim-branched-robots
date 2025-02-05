@@ -30,26 +30,19 @@ sudo add-apt-repository ppa:dqrobotics-dev/development -y
 sudo apt-get update
 sudo apt-get install libdqrobotics
 ```
+### Install [DQ Dynamics](https://github.com/ffasilva/dynamic-modular-composition-cpp.git) for C++
 
-### Install [V-REP Interface Package](https://github.com/dqrobotics/cpp-interface-vrep.git) for C++ 
+Skip these steps if you already have DQ Dynamics installed.
 
-Skip these steps if you already have V-REP Interface Package installed.
-
-#### MacOS (Apple Silicon)
+#### UNIX
 
 ```shell
-git clone https://github.com/dqrobotics/cpp-interface-vrep.git
-cd cpp-interface-vrep
+git clone https://github.com/ffasilva/dynamic-modular-composition-cpp.git
+cd dynamic-modular-composition-cpp
 mkdir build && cd build
 cmake ..
 make -j16
 sudo make install
-```
-
-#### Ubuntu 
-
-```shell
-sudo apt-get install libdqrobotics-interface-vrep
 ```
 
 ## Build and Install (UNIX)
