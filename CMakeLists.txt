@@ -52,6 +52,7 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
 
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
 
+    src/dqdynamics/utils/math.cpp
     src/dqdynamics/utils/NumericalDifferentiation.cpp
     )
 
@@ -103,6 +104,7 @@ INSTALL(FILES
 
 # utils headers
 INSTALL(FILES
+    include/dqdynamics/utils/math.h
     include/dqdynamics/utils/NumericalDifferentiation.h
 
     DESTINATION "include/dqdynamics/utils")
@@ -137,6 +139,7 @@ INSTALL(FILES
 
 # utils folder
 INSTALL(FILES
+    src/dqdynamics/utils/math.cpp
     src/dqdynamics/utils/NumericalDifferentiation.cpp
 
     DESTINATION "src/dqdynamics/utils")
