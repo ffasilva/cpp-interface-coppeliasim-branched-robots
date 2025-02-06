@@ -117,7 +117,6 @@ DQ_SerialManipulatorDynamics LBR4pCoppeliaSimZMQRobot::dynamics()
         this->base_frame_name_);
     dyn.set_reference_frame(base_frame);
     dyn.set_base_frame(base_frame);
-    dyn.set_effector(DQ_robotics::DQ(1));
 
     // Update dynamic parameters with CoppeliaSim information
     auto dyn_sptr = std::make_shared<DQ_SerialManipulatorDynamics>(dyn);
