@@ -37,6 +37,7 @@ namespace DQ_dynamics
 **************OPERATORS******************************************
 *****************************************************************/
 
+double cmc (const VectorXd& waveform1, const VectorXd& waveform2);
 double variance(const VectorXd& q);
 
 }//namespace DQ_dynamics

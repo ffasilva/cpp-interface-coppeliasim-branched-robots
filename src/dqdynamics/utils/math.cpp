@@ -30,9 +30,54 @@ namespace DQ_dynamics
 *****************************************************************/
 
 /**
+ * @brief Returns the CMC between two curves of same length, as
+ *        described in:
+ *          Ferrari, A., Cutti, A. G., and Cappello, A. (2010).
+ *          ‘A new formulation of the coefficient of multiple correlation
+ *           to assess the similarity of waveforms measured synchronously
+ *           by different motion analysis protocols’.
+ *          Gait and Posture, 31(4), 540–542.
+ *          https://doi.org/10.1016/j.gaitpost.2010.02.009.
+ *
+ *        Adapted from the MATLAB implementation by:
+ *          Ana Christine de Oliveira (ana.oliveira@utexas.edu)
+ * @param waveform1 A VectorXd vector with data from the first waveform.
+ * @param waveform2 A VectorXd vector with data from the second waveform.
+ * @return The CMC between two curves, given by a value between 0 and 1.
+ *         The closer to 1, the more similar the waverforms are. A NaN
+ *         value represents dissimilarity.
+ */
+double cmc(const VectorXd& waveform1, const VectorXd& waveform2)
+{
+    int frames1 = waveform1.rows();
+    int frames2 = waveform2.rows();
+    if (frames1 != frames2){
+        throw std::runtime_error("The waveforms should be of the same "
+                                 "size!");
+    }
+
+    VectorXd Yf_bar = 1.0/2.0*(waveform1 + waveform2);
+    auto partial_num = ((waveform1 - Yf_bar).array().pow(2) +
+                        (waveform2 - Yf_bar).array().pow(2)).sum();
+    double numerator = partial_num/(frames1);
+
+    double Y_bar = 1.0/(2.0*frames1)*(waveform1.sum() + waveform2.sum());
+    auto partial_den = ((waveform1.array() - Y_bar).array().pow(2) +
+                        (waveform2.array() - Y_bar).array().pow(2)).sum();
+    double denominator = partial_den/((2*frames2 - 1));
+
+    double ret = sqrt(1 - numerator/denominator);
+    if (std::isnan(ret)){ // a NaN value represents dissimilarity
+        ret = 0.0;
+    }
+
+    return ret;
+}
+
+/**
  * @brief Returns the variance of the elements of a vector.
  * @param q A VectorXd with double elements.
- * @return The the variance of the elements of the input vector.
+ * @return The variance of the elements of the input vector.
  */
 double variance(const VectorXd &q)
 {
