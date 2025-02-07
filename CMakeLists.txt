@@ -50,6 +50,7 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
 
     src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
 
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/utils/math.cpp
@@ -98,6 +99,7 @@ INSTALL(FILES
 
 # ZMQ robots headers
 INSTALL(FILES
+    include/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.h
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.h
 
     DESTINATION "include/dqdynamics/interfaces/coppeliasim/zmq/robots")
@@ -133,6 +135,7 @@ INSTALL(FILES
 
 # ZMQ robots folder
 INSTALL(FILES
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
 
     DESTINATION "src/dqdynamics/interfaces/coppeliasim/zmq/robots")
