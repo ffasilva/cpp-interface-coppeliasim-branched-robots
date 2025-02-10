@@ -29,6 +29,7 @@ Contributors to this file:
 #include <dqrobotics/DQ.h>
 
 #include <memory.h>
+#include <string>
 
 namespace DQ_dynamics
 {
@@ -54,6 +55,17 @@ BM_TRO2023CoppeliaSimZMQRobot::BM_TRO2023CoppeliaSimZMQRobot(
     const std::shared_ptr<DQ_CoppeliaSimInterfaceZMQExperimental>& vrep_interface_sptr):
     DQ_BranchedCoppeliaSimZMQRobot(robot_name, vrep_interface_sptr)
 {
+    // Fix the joint names automatically assigned by the
+    // DQ_CoppeliaSimRobotZMQ class
+    for (unsigned long i=0; i<this->jointnames_.size(); i++){
+        this->jointnames_.at(i) = robot_name + "/joint" + std::to_string(i+1);
+    }
+
+    // Fix the link names automatically assigned by the
+    // DQ_BranchedCoppeliaSimZMQRobot class
+    for (unsigned long i=0; i<this->link_names_.size(); i++){
+        this->link_names_.at(i) = robot_name + "/link" + std::to_string(i+2);
+    }
 }
 
 /**
@@ -127,6 +139,7 @@ DQ_BranchedWholeBody BM_TRO2023CoppeliaSimZMQRobot::dynamics()
     // dyn.set_masses(masses);
     // dyn.set_position_CoMs(position_CoMs);
     // dyn.set_inertia_tensors(inertia_tensors);
+    update_dynamic_parameters(dyn);
 
     return dyn;
 }

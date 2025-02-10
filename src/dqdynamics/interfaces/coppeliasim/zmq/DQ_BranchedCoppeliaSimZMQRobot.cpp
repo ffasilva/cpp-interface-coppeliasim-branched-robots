@@ -70,19 +70,18 @@ DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters()
  *        in which range from the properties 'joint_names'/'link_names'
  *        the link/joint names of this branch are stored.
  */
-std::tuple<VectorXd, VectorXdq, std::vector<Matrix3d> >
-DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
-    std::shared_ptr<DQ_Dynamics> robot_dynamics,
+void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
+    DQ_Dynamics& robot_dynamics,
     const int&starting_name_index)
 {
-    const int& dim_configuration_space = robot_dynamics->
-                                         get_dim_configuration_space();
+    const int& dim_configuration_space =
+        robot_dynamics.get_dim_configuration_space();
     VectorXd masses = VectorXd::Zero(dim_configuration_space, 1);
     VectorXdq position_CoMs = VectorXdq::Zero(dim_configuration_space, 1);
     std::vector<Matrix3d> inertia_tensors;
 
     int name_index = starting_name_index;
-    VectorXd q_read = robot_dynamics->get_configuration_space_positions();
+    VectorXd q_read = robot_dynamics.get_configuration_space_positions();
     for (int i=0; i<dim_configuration_space; i++){
         std::string link_name = this->link_names_.at(name_index);
 
@@ -96,18 +95,16 @@ DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
         DQ_robotics::DQ rcm_in_0 = this->_get_interface_sptr()->get_object_rotation(
             link_name);
         DQ_robotics::DQ xcm_in_0 = rcm_in_0 + 0.5*DQ_robotics::E_*pcm_in_0*rcm_in_0;
-        DQ_robotics::DQ xl_in_0 = robot_dynamics->fkm(q_read, i);
+        DQ_robotics::DQ xl_in_0 = robot_dynamics.fkm(q_read, i);
         DQ_robotics::DQ xcm_in_xl = (xl_in_0.conj())*xcm_in_0;
         position_CoMs(i) = xcm_in_xl.translation();
-
-        // I need to make sure that set_position_CoMs() calls _update_dh_frames()
-        // as it is, updating the CoM position does not update the pose
 
         // Get the link's inertia tensor with respect to the end-link frame
         MatrixXd inertia_tensor_in_0 = this->_get_interface_sptr()->
                                        get_inertia_matrix(link_name,
             DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::ABSOLUTE_FRAME);
-        Matrix3d Rcm_in_0 = DQ_Conversions::rotation_matrix_from_quaternion(xcm_in_0.P());
+        Matrix3d Rcm_in_0 =
+            DQ_Conversions::rotation_matrix_from_quaternion(xcm_in_0.P());
         const Matrix3d inertia_tensor_ith_link =
             (Rcm_in_0.transpose())*inertia_tensor_in_0*Rcm_in_0;
         inertia_tensors.push_back(inertia_tensor_ith_link);
@@ -116,7 +113,9 @@ DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
         ++name_index;
     }
 
-    return std::make_tuple(masses, position_CoMs, inertia_tensors);
+    robot_dynamics.set_masses(masses);
+    robot_dynamics.set_position_CoMs(position_CoMs);
+    robot_dynamics.set_inertia_tensors(inertia_tensors);
 }
 
 /**
@@ -130,26 +129,16 @@ DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
  *        the link/joint names of this serial manipulator are stored.
  *        (Default: 1)
  */
-std::tuple<VectorXd,
-           VectorXdq,
-           std::vector<Matrix3d> >
-DQ_BranchedCoppeliaSimZMQRobot::update_dynamic_parameters(
-    std::shared_ptr<DQ_SerialManipulatorDynamics> robot_dynamics,
+void DQ_BranchedCoppeliaSimZMQRobot::update_dynamic_parameters(
+    DQ_SerialManipulatorDynamics& robot_dynamics,
     const int &starting_name_index)
 {
     std::cout << "Updating dynamic parameters of the robotic manipulator..."
               << std::endl;
     std::cout << std::endl;
 
-    const int& dim_configuration_space = robot_dynamics->
-                                         get_dim_configuration_space();
-    VectorXd masses = VectorXd::Zero(dim_configuration_space, 1);
-    VectorXdq position_CoMs = VectorXdq::Zero(dim_configuration_space, 1);
-    std::vector<Matrix3d> inertia_tensors;
-    std::tie(masses, position_CoMs, inertia_tensors) = this->
-            update_branch_dynamic_parameters(robot_dynamics, starting_name_index);
+    update_branch_dynamic_parameters(robot_dynamics, starting_name_index);
 
-    return std::make_tuple(masses, position_CoMs, inertia_tensors);
 }
 
 /**
@@ -163,19 +152,24 @@ DQ_BranchedCoppeliaSimZMQRobot::update_dynamic_parameters(
  *        the link/joint names of this branch are stored. (Default: 1)
  */
 void DQ_BranchedCoppeliaSimZMQRobot::update_dynamic_parameters(
-    std::shared_ptr<DQ_BranchedWholeBody> robot_dynamics,
+    DQ_BranchedWholeBody &robot_dynamics,
     const int &starting_name_index)
 {
-    int chain_size = robot_dynamics->get_chain().size();
+    int chain_size = robot_dynamics.get_chain().size();
 
     int name_index = starting_name_index;
-    std::vector<std::shared_ptr<DQ_Dynamics>> my_chain = robot_dynamics->get_chain();
+    std::vector<std::shared_ptr<DQ_Dynamics>> my_chain =
+        robot_dynamics.get_chain();
     for (int i=0; i<chain_size; i++){
-        this->update_branch_dynamic_parameters(my_chain.at(i), name_index);
+        std::cout << "Updating dynamic parameters of subsystem "
+                  << i+1 << "..." << std::endl;
+
+        this->update_branch_dynamic_parameters(*my_chain.at(i), name_index);
 
         name_index = name_index +
-                     my_chain.at(i)->get_configuration_space_positions().size();
+            my_chain.at(i)->get_configuration_space_positions().size();
     }
+    std::cout << std::endl;
 }
 
 /****************************************************************
