@@ -126,19 +126,6 @@ DQ_BranchedWholeBody BM_TRO2023CoppeliaSimZMQRobot::dynamics()
     }
 
     // // Update dynamic parameters with CoppeliaSim information
-    // auto dyn_sptr = std::make_shared<DQ_BranchedWholeBody>(dyn);
-
-    // const int& dim_configuration_space = dyn.get_dim_configuration_space();
-    // VectorXd masses = VectorXd::Zero(dim_configuration_space, 1);
-    // VectorXdq position_CoMs = VectorXdq::Zero(dim_configuration_space, 1);
-    // std::vector<Matrix3d> inertia_tensors;
-
-    // std::tie(masses, position_CoMs, inertia_tensors) = this->
-    //                                             update_dynamic_parameters(dyn_sptr);
-
-    // dyn.set_masses(masses);
-    // dyn.set_position_CoMs(position_CoMs);
-    // dyn.set_inertia_tensors(inertia_tensors);
     update_dynamic_parameters(dyn);
 
     return dyn;
