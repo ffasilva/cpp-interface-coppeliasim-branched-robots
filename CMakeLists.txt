@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES(include)
 if(UNIX AND NOT APPLE)
     FIND_PACKAGE(Eigen3 REQUIRED)
     INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR}) #Writing this way is more OS agnostic
-    ADD_COMPILE_OPTIONS(-Werror=return-type -Wall -Wextra -Wmissing-declarations -Wredundant-decls -Woverloaded-virtual)
+    ADD_COMPILE_OPTIONS(-O3 -Werror=return-type -Wall -Wextra -Wmissing-declarations -Wredundant-decls -Woverloaded-virtual)
 endif()
 
 if(APPLE)
@@ -23,7 +23,7 @@ if(APPLE)
         # Most recent versions of brew install here
         /opt/homebrew/include
         /opt/homebrew/include/eigen3)
-    ADD_COMPILE_OPTIONS(-Werror=return-type -Wall -Wextra -Wmissing-declarations -Wredundant-decls -Woverloaded-virtual)
+    ADD_COMPILE_OPTIONS(-O3 -Werror=return-type -Wall -Wextra -Wmissing-declarations -Wredundant-decls -Woverloaded-virtual)
     # The library is installed here when using the regular cmake ., make, sudo make install
     LINK_DIRECTORIES(
         /usr/local/lib/
@@ -50,8 +50,10 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
 
     src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
 
-    src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.cpp
+
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/utils/math.cpp
     src/dqdynamics/utils/NumericalDifferentiation.cpp
@@ -99,8 +101,10 @@ INSTALL(FILES
 
 # ZMQ robots headers
 INSTALL(FILES
-    include/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.h
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.h
+    include/dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.h
+
+    include/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.h
 
     DESTINATION "include/dqdynamics/interfaces/coppeliasim/zmq/robots")
 
@@ -135,8 +139,10 @@ INSTALL(FILES
 
 # ZMQ robots folder
 INSTALL(FILES
-    src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.cpp
+
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
 
     DESTINATION "src/dqdynamics/interfaces/coppeliasim/zmq/robots")
 
