@@ -74,15 +74,14 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
     DQ_Dynamics& robot_dynamics,
     const int&starting_name_index)
 {
-    const int& dim_configuration_space =
-        robot_dynamics.get_dim_configuration_space();
-    VectorXd masses = VectorXd::Zero(dim_configuration_space, 1);
-    VectorXdq position_CoMs = VectorXdq::Zero(dim_configuration_space, 1);
+    const int& num_bodies = robot_dynamics.get_num_bodies();
+    VectorXd masses = VectorXd::Zero(num_bodies, 1);
+    VectorXdq position_CoMs = VectorXdq::Zero(num_bodies, 1);
     std::vector<Matrix3d> inertia_tensors;
 
     int name_index = starting_name_index;
     VectorXd q_read = robot_dynamics.get_configuration_space_positions();
-    for (int i=0; i<dim_configuration_space; i++){
+    for (int i=0; i<num_bodies; i++){
         std::string link_name = this->link_names_.at(name_index);
 
         // Get the link's mass
