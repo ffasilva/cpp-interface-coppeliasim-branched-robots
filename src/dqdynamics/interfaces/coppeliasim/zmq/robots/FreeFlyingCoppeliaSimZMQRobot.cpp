@@ -24,7 +24,9 @@ Contributors to this file:
 
 #include <dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.h>
 
-// #include <dqrobotics/utils/DQ_Constants.h>
+#include <dqdynamics/robots/FreeFlyingRobotDynamics.h>
+
+#include <dqrobotics/DQ.h>
 
 namespace DQ_dynamics
 {
@@ -47,9 +49,94 @@ namespace DQ_dynamics
  */
 FreeFlyingCoppeliaSimZMQRobot::FreeFlyingCoppeliaSimZMQRobot(
     const std::string& robot_name,
-    const std::shared_ptr<DQ_CoppeliaSimInterfaceZMQExperimental>& vrep_interface_sptr):
+    const std::shared_ptr<DQ_CoppeliaSimInterfaceZMQExperimental>&
+        vrep_interface_sptr):
     DQ_BranchedCoppeliaSimZMQRobot(robot_name, vrep_interface_sptr)
 {
+    // Fix the joint names automatically assigned by the
+    // DQ_CoppeliaSimRobotZMQ class
+    this->jointnames_.at(0) = "/free_flying/free_flying_prism_joint_x";
+    this->jointnames_.at(1) = "/free_flying/free_flying_prism_joint_y";
+    this->jointnames_.at(2) = "/free_flying/free_flying_prism_joint_z";
+    this->jointnames_.at(3) = "/free_flying/free_flying_rev_joint_x";
+    this->jointnames_.at(4) = "/free_flying/free_flying_rev_joint_y";
+    this->jointnames_.at(5) = "/free_flying/free_flying_rev_joint_z";
+
+    // Fix base frame name automatically assigned by the
+    // DQ_CoppeliaSimRobotZMQ class
+    base_frame_name_ = "/free_flying";
+}
+
+/**
+ * @brief Returns the vec8() of the unit dual quaternion representing the pose
+ *        of the free-flying robot in the CoppeliaSim scene. This method is
+ *        kept for compatibility with other classes that rely on calls to
+ *        get_configuration_space() in which the return is a vector of real
+ *        numbers.
+ *
+ * @return A VectorXd with the coefficients of the unit dual quaternion
+ *         representing the pose of the free-flying robot in the CoppeliaSim
+ *         scene.
+ *
+ *  Example:
+ *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *      vi->connect();
+ *      vi->start_simulation();
+ *      FreeFlyingCoppeliaSimZMQRobot free_flying_coppeliasim_robot(
+ *          "/free_flying",
+ *          vi);
+ *      VectorXd q = free_flying_coppeliasim_robot.get_configuration_space();
+ *      vi->stop_simulation();
+ */
+VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space()
+{
+    // Read the robot's pose from CoppeliaSim
+    const auto coppeliasim_sptr = this->_get_interface_sptr();
+    DQ_robotics::DQ x = coppeliasim_sptr->get_object_pose(base_frame_name_);
+
+    // Vectorizes the pose for compatibility with other classes that rely
+    // on calls to get_configuration_space() in which the return is a
+    // vector of real numbers
+    VectorXd x_vec = x.vec8();
+
+    return x_vec;
+}
+
+/**
+ * @brief Returns the vec8() of the pure dual quaternion representing the
+ *        twist of the free-flying robot in the CoppeliaSim scene. This
+ *        method is kept for compatibility with other classes that rely
+ *        on calls to get_configuration_space_velocities() in which the
+ *        return is a vector of real numbers.
+ *
+ * @return A VectorXd with the coefficients of the pure dual quaternion
+ *         representing the twist of the free-flying robot in the CoppeliaSim
+ *         scene.
+ *
+ *  Example:
+ *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *      vi->connect();
+ *      vi->start_simulation();
+ *      FreeFlyingCoppeliaSimZMQRobot free_flying_coppeliasim_robot(
+ *          "/free_flying",
+ *          vi);
+ *      VectorXd dq =
+ *          free_flying_coppeliasim_robot.get_configuration_space_velocities();
+ *      vi->stop_simulation();
+ */
+VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space_velocities()
+{
+    // Read the robot's twist from CoppeliaSim
+    const auto coppeliasim_sptr = this->_get_interface_sptr();
+    DQ_robotics::DQ xi = coppeliasim_sptr->get_twist(base_frame_name_,
+        DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::BODY_FRAME);
+
+    // Vectorizes the twist for compatibility with other classes that rely
+    // on calls to get_configuration_space_velocities() in which the return
+    // is a vector of real numbers
+    VectorXd xi_vec = xi.vec8();
+
+    return xi_vec;
 }
 
 /**
@@ -73,21 +160,21 @@ DQ_FreeFlyingRobotDynamics FreeFlyingCoppeliaSimZMQRobot::dynamics()
     // Create a DQ_FreeFlyingRobotDynamics object
     DQ_FreeFlyingRobotDynamics dyn = FreeFlyingRobotDynamics::dynamics();
 
-    // // Set the robot configuration with CoppeliaSim values
-    // VectorXd q_read = this->get_configuration_space();
-    // VectorXd dq_read = this->get_configuration_space_velocities();
-    // VectorXd ddq_read = VectorXd::Zero(7,1);
+    // Set the robot configuration with CoppeliaSim values
+    VectorXd q_read = this->get_configuration_space();
+    VectorXd dq_read = this->get_configuration_space_velocities();
+    VectorXd ddq_read = VectorXd::Zero(8,1);
 
-    // dyn.set_configurations(q_read, dq_read, ddq_read);
+    dyn.set_configurations(q_read, dq_read, ddq_read);
 
-    // // Update base and reference frame with CoppeliaSim values
-    // const DQ& base_frame = this->_get_interface_sptr()->get_object_pose(
-    //     this->base_frame_name_);
-    // dyn.set_reference_frame(base_frame);
-    // dyn.set_base_frame(base_frame);
+    // Update base and reference frame with CoppeliaSim values
+    const DQ& base_frame = this->_get_interface_sptr()->get_object_pose(
+        this->base_frame_name_);
+    dyn.set_reference_frame(base_frame);
+    dyn.set_base_frame(base_frame);
 
-    // // Update dynamic parameters with CoppeliaSim information
-    // update_dynamic_parameters(dyn);
+    // Update dynamic parameters with CoppeliaSim information
+    this->update_branch_dynamic_parameters(dyn, 0);
 
     return dyn;
 }
