@@ -64,7 +64,10 @@ FreeFlyingCoppeliaSimZMQRobot::FreeFlyingCoppeliaSimZMQRobot(
 
     // Fix base frame name automatically assigned by the
     // DQ_CoppeliaSimRobotZMQ class
-    base_frame_name_ = "/free_flying";
+    base_frame_name_ = "/free_flying/free_flying_base";
+
+    // Set the name of the robot's force sensor
+    force_sensor_name_ = "/free_flying/force_sensor";
 }
 
 /**
@@ -128,8 +131,9 @@ VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space_velocities()
 {
     // Read the robot's twist from CoppeliaSim
     const auto coppeliasim_sptr = this->_get_interface_sptr();
-    DQ_robotics::DQ xi = coppeliasim_sptr->get_twist(base_frame_name_,
-        DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::BODY_FRAME);
+    // DQ_robotics::DQ xi = coppeliasim_sptr->get_twist(base_frame_name_,
+    //     DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::BODY_FRAME);
+    DQ_robotics::DQ xi = coppeliasim_sptr->get_twist(base_frame_name_);
 
     // Vectorizes the twist for compatibility with other classes that rely
     // on calls to get_configuration_space_velocities() in which the return
@@ -137,6 +141,41 @@ VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space_velocities()
     VectorXd xi_vec = xi.vec8();
 
     return xi_vec;
+}
+
+/**
+ * @brief Returns the vec6() of the pure dual quaternion representing the
+ *        wrench read from the robot's force sensor in the CoppeliaSim
+ *        scene. This method is kept for compatibility with other classes
+ *        that rely on calls to get_configuration_space_torques() in which
+ *        the return is a vector of real numbers.
+ *
+ * @return A VectorXd with the coefficients of the pure dual quaternion
+ *         representing the wrench read from the robot's force sensor
+ *         in the CoppeliaSim scene.
+ *
+ *  Example:
+ *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
+ *      vi->connect();
+ *      vi->start_simulation();
+ *      FreeFlyingCoppeliaSimZMQRobot free_flying_coppeliasim_robot(
+ *          "/free_flying",
+ *          vi);
+ *      VectorXd tau =
+ *          free_flying_coppeliasim_robot.get_configuration_space_torques();
+ *      vi->stop_simulation();
+ */
+VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space_torques()
+{
+    // Read the wrench from the robot's force sensor in CoppeliaSim
+    const auto coppeliasim_sptr = this->_get_interface_sptr();
+    DQ_robotics::DQ sensor_wrench = coppeliasim_sptr->get_sensor_wrench(
+        "/free_flying/force_sensor");
+
+    // Vectorizes the wrench for compatibility with other classes that rely
+    // on calls to get_configuration_space_torques() in which the return
+    // is a vector of real numbers
+    return sensor_wrench.vec6();
 }
 
 /**

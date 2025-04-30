@@ -33,6 +33,8 @@ namespace DQ_dynamics
 
 class FreeFlyingCoppeliaSimZMQRobot: public DQ_BranchedCoppeliaSimZMQRobot
 {
+protected:
+    std::string force_sensor_name_;
 public:
     FreeFlyingCoppeliaSimZMQRobot() = delete;
     FreeFlyingCoppeliaSimZMQRobot(const std::string& robot_name,
@@ -49,7 +51,7 @@ public:
     // void set_target_configuration_space_velocities(const VectorXd& v_target) override;
 
     // void set_configuration_space_torques(const VectorXd& t) override;
-    // VectorXd get_configuration_space_torques() override;
+    VectorXd get_configuration_space_torques() override;
 
     DQ_FreeFlyingRobotDynamics dynamics();
 };
