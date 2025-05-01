@@ -66,6 +66,13 @@ FreeFlyingCoppeliaSimZMQRobot::FreeFlyingCoppeliaSimZMQRobot(
     // DQ_CoppeliaSimRobotZMQ class
     base_frame_name_ = "/free_flying/free_flying_base";
 
+    // Fix the joint names automatically assigned by the
+    // DQ_CoppeliaSimRobotZMQ class. This property is used for
+    // compatibility with the
+    // DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters()
+    // method
+    link_names_.at(0) = base_frame_name_;
+
     // Set the name of the robot's force sensor
     force_sensor_name_ = "/free_flying/force_sensor";
 }
@@ -169,13 +176,24 @@ VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space_torques()
 {
     // Read the wrench from the robot's force sensor in CoppeliaSim
     const auto coppeliasim_sptr = this->_get_interface_sptr();
-    DQ_robotics::DQ sensor_wrench = coppeliasim_sptr->get_sensor_wrench(
-        "/free_flying/force_sensor");
+    DQ_robotics::DQ sensor_wrench_in_sensor =
+        coppeliasim_sptr->get_sensor_wrench(force_sensor_name_);
+
+    // Conjugate the wrench because the generalized forces are
+    // given by the wrench acting on the robot rather than by the
+    // reaction forces read by the sensor
+    DQ_robotics::DQ wrench_in_sensor = sensor_wrench_in_sensor.conj();
+
+    // Express the wrench in the inertial frame
+    DQ_robotics::DQ sensor_pose = coppeliasim_sptr->get_object_pose(
+        force_sensor_name_);
+    DQ_robotics::DQ wrench = DQ_robotics::Ad(sensor_pose.P(),
+                                             wrench_in_sensor);
 
     // Vectorizes the wrench for compatibility with other classes that rely
     // on calls to get_configuration_space_torques() in which the return
     // is a vector of real numbers
-    return sensor_wrench.vec6();
+    return wrench.vec6();
 }
 
 /**
