@@ -55,6 +55,14 @@ DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters()
     // Update the mobile base's inertia tensor
     MatrixXd inertia_tensor =
         this->_get_interface_sptr()->get_inertia_matrix(this->base_frame_name_);
+
+    const double joint_armature =
+        this->_get_interface_sptr()->get_mujoco_joint_armature(
+            this->base_frame_name_);
+    if (joint_armature != 0){
+        inertia_tensor = inertia_tensor + pow(joint_armature,2.)*inertia_tensor;
+    }
+
     std::vector<Matrix3d> inertia_tensors{inertia_tensor};
 
     return std::make_tuple(masses, position_CoMs, inertia_tensors);
@@ -104,8 +112,17 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
             DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::ABSOLUTE_FRAME);
         Matrix3d Rcm_in_0 =
             DQ_Conversions::rotation_matrix_from_quaternion(xcm_in_0.P());
-        const Matrix3d inertia_tensor_ith_link =
+        Matrix3d inertia_tensor_ith_link =
             (Rcm_in_0.transpose())*inertia_tensor_in_0*Rcm_in_0;
+
+        const double joint_armature =
+            this->_get_interface_sptr()->get_mujoco_joint_armature(
+                jointnames_.at(name_index));
+        if (joint_armature != 0){
+            inertia_tensor_ith_link = inertia_tensor_ith_link +
+                                      pow(joint_armature,2.)*inertia_tensor_ith_link;
+        }
+
         inertia_tensors.push_back(inertia_tensor_ith_link);
 
         // Move to the next name index
@@ -215,6 +232,82 @@ void DQ_BranchedCoppeliaSimZMQRobot::set_joint_operation_modes(
     this->_get_interface_sptr()->set_joint_modes(this->jointnames_, joint_mode);
     this->_get_interface_sptr()->set_joint_control_modes(this->jointnames_,
                                                          joint_control_mode);
+}
+
+/**
+ * @brief Sets the joint armatures. This results in the effect known as
+ *        “reflected inertia,” which is equivalent to multiplying the inertia
+ *        tensor of the body actuated by the joint by the square of the joint
+ *        armature. For instance, if the body actuated by a joint has inertia
+ *        tensor I, setting the joint armature to x is equivalent to setting
+ *        the inertia tensor of the body to I + (x^2)*I. This parameter only
+ *        applies to the MuJoCo engine. For more details, refer to:
+ *          https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-joint-armature
+ *
+ * @param joint_armatures An integer representing additional inertia associated
+ *        with movement of the joint that is not due to body mass.
+ */
+void DQ_BranchedCoppeliaSimZMQRobot::set_joint_armatures(const int& joint_armatures)
+{
+    // Check if the simulation is using the MuJoCo engine
+    if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
+        throw std::runtime_error("This joint armatures only apply to the MuJoCo "
+                                 "engine! Please change the engine of your "
+                                 "simulation before using this method.");
+    }
+
+    // Set the joint armature of all the joints
+    this->_get_interface_sptr()->set_mujoco_joint_armatures(jointnames_,
+                                                            joint_armatures);
+}
+
+/**
+ * @brief Sets the joint dampings. This parameter only applies to the MuJoCo
+ *        engine. For more details, refer to:
+ *          https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-joint-damping
+ *
+ * @param joint_dampings An integer representing the damping applied to all
+ *        degrees of freedom created by this joint.
+ */
+void DQ_BranchedCoppeliaSimZMQRobot::set_joint_dampings(const int& joint_dampings)
+{
+    // Check if the simulation is using the MuJoCo engine
+    if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
+        throw std::runtime_error("This joint armatures only apply to the MuJoCo "
+                                 "engine! Please change the engine of your "
+                                 "simulation before using this method.");
+    }
+
+    // Set the joint dampings of all the joints
+    this->_get_interface_sptr()->set_mujoco_joint_dampings(jointnames_,
+                                                           joint_dampings);
+}
+
+/**
+ * @brief Sets the contact friction parameters of all the links. This parameter
+ *        only applies to the MuJoCo engine. For more details, refer to:
+ *          https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-geom-friction
+ *
+ * @param link_frictions A vector of integers in which each element represents
+ *        the contact friction parameters of the link. The first number is the
+ *        sliding friction, acting along both axes of the tangent plane. The
+ *        second number is the torsional friction, acting around the contact
+ *        normal. The third number is the rolling friction, acting around
+ *        both axes of the tangent plane.
+ */
+void DQ_BranchedCoppeliaSimZMQRobot::set_link_frictions(
+    const std::vector<double>& link_frictions)
+{
+    // Check if the simulation is using the MuJoCo engine
+    if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
+        throw std::runtime_error("This joint armatures only apply to the MuJoCo "
+                                 "engine! Please change the engine of your "
+                                 "simulation before using this method.");
+    }
+
+    // Set the friction coefficients of all the links
+    this->_get_interface_sptr()->set_mujoco_body_frictions(link_names_,
+                                                           link_frictions);
 }
 
 }//namespace DQ_dynamics
