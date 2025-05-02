@@ -39,10 +39,8 @@ namespace DQ_dynamics
  *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *          vi->connect();
  *          vi->start_simulation();
- *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
- *                                      "/LBR4p");
- *          B1LegCoppeliaSimZMQ lbr4p_coppeliasim_robot("/LBR4p", vi);
- *          auto q = lbr4p_coppeliasim_robot.get_joint_positions();
+ *          B1LegCoppeliaSimZMQ legb1_coppeliasim_robot("/UnitreeB1", vi);
+ *          auto q = legb1_coppeliasim_robot.get_joint_positions();
  *          vi->stop_simulation();
  */
 B1LegCoppeliaSimZMQ::B1LegCoppeliaSimZMQ(
@@ -72,17 +70,16 @@ B1LegCoppeliaSimZMQ::B1LegCoppeliaSimZMQ(
 /**
  * @brief This method constructs an instance of a DQ_SerialManipulatorDH.
  *
- * @return A DQ_SerialManipulatorDH representing a KUKA LBR+ robot.
+ * @return A DQ_SerialManipulatorDH representing a leg from Unitree's B1
+ *        robot.
  *
  *  Example:
  *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *      vi->connect();
  *      vi->start_simulation();
- *      vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
- *                                  "/LBR4p");
- *      B1LegCoppeliaSimZMQ lbr4p_coppeliasim_robot("/LBR4p", vi);
- *      DQ_SerialManipulatorDH lbr4p_robot =
- *                                  lbr4p_coppeliasim_robot.kinematics();
+ *      B1LegCoppeliaSimZMQ legb1_coppeliasim_robot("/UnitreeB1", vi);
+ *      DQ_SerialManipulatorDH legb1_robot =
+ *                                  legb1_coppeliasim_robot.kinematics();
  *      vi->stop_simulation();
  */
 DQ_SerialManipulatorDH B1LegCoppeliaSimZMQ::kinematics()
@@ -91,11 +88,11 @@ DQ_SerialManipulatorDH B1LegCoppeliaSimZMQ::kinematics()
     DQ_SerialManipulatorDH kin = B1Leg::kinematics();
 
     // Update base and reference frame with CoppeliaSim values
-    kin.set_reference_frame(this->_get_interface_sptr()->get_object_pose(
-                                                            this->base_frame_name_));
-    kin.set_base_frame(this->_get_interface_sptr()->get_object_pose(
-                                                            this->base_frame_name_));
-    kin.set_effector(1+0.5*E_*k_*0.07);
+    const DQ& base_frame = this->_get_interface_sptr()->get_object_pose(
+        this->base_frame_name_);
+    kin.set_reference_frame(base_frame);
+    kin.set_base_frame(base_frame);
+
     return kin;
 }
 
@@ -108,11 +105,9 @@ DQ_SerialManipulatorDH B1LegCoppeliaSimZMQ::kinematics()
  *      auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *      vi->connect();
  *      vi->start_simulation();
- *      vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
- *                                  "/LBR4p");
- *      B1LegCoppeliaSimZMQ lbr4p_coppeliasim_robot("/LBR4p", vi);
- *      DQ_SerialManipulatorDynamics lbr4p_robot =
- *                                      lbr4p_coppeliasim_robot.dynamics();
+ *      B1LegCoppeliaSimZMQ legb1_coppeliasim_robot("/UnitreeB1", vi);
+ *      DQ_SerialManipulatorDynamics legb1_robot =
+ *                                      legb1_coppeliasim_robot.dynamics();
  *      vi->stop_simulation();
  */
 DQ_SerialManipulatorDynamics B1LegCoppeliaSimZMQ::dynamics()
