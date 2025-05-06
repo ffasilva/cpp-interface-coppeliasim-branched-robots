@@ -39,9 +39,7 @@ class DQ_BranchedCoppeliaSimZMQRobot: public DQ_robotics::DQ_CoppeliaSimRobotZMQ
 protected:
     std::vector<std::string> link_names_;
 
-    std::tuple<VectorXd,
-               VectorXdq,
-               std::vector<Matrix3d>> update_base_dynamic_parameters();
+    void update_base_dynamic_parameters(DQ_Dynamics& robot_dynamics);
     void update_branch_dynamic_parameters(DQ_Dynamics& robot_dynamics,
                                           const int&starting_name_index);
     void update_dynamic_parameters(DQ_SerialManipulatorDynamics& robot_dynamics,

@@ -38,8 +38,8 @@ namespace DQ_dynamics
  * @param robot_dynamics A DQ_Dynamics object representing the robot's base
  *        in the CoppeliaSim scene.
  */
-std::tuple<VectorXd, VectorXdq, std::vector<Matrix3d> >
-DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters()
+void DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters(
+    DQ_Dynamics& robot_dynamics)
 {
     // Update the mobile base's mass
     double mass = this->_get_interface_sptr()->get_mass(this->base_frame_name_);
@@ -48,13 +48,15 @@ DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters()
 
     // Update the mobile base's center of mass position
     DQ_robotics::DQ center_of_mass =
-        this->_get_interface_sptr()->get_center_of_mass(this->base_frame_name_);
+        this->_get_interface_sptr()->get_center_of_mass(this->base_frame_name_,
+            DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::BODY_FRAME);
     VectorXdq position_CoMs = VectorXdq::Zero(1, 1);
     position_CoMs(0)= center_of_mass;
 
     // Update the mobile base's inertia tensor
     MatrixXd inertia_tensor =
-        this->_get_interface_sptr()->get_inertia_matrix(this->base_frame_name_);
+        this->_get_interface_sptr()->get_inertia_matrix(this->base_frame_name_,
+            DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::BODY_FRAME);
 
     // Check if the simulation is using the MuJoCo engine and include
     // the effects of joint armature in the link's inertia
@@ -69,7 +71,9 @@ DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters()
 
     std::vector<Matrix3d> inertia_tensors{inertia_tensor};
 
-    return std::make_tuple(masses, position_CoMs, inertia_tensors);
+    robot_dynamics.set_masses(masses);
+    robot_dynamics.set_position_CoMs(position_CoMs);
+    robot_dynamics.set_inertia_tensors(inertia_tensors);
 }
 
 /**
