@@ -187,10 +187,11 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_dynamic_parameters(
     std::vector<std::shared_ptr<DQ_Dynamics>> my_chain =
         robot_dynamics.get_chain();
 
-    DQ_FreeFlyingRobotDynamics* ff_prt;
-    ff_prt = dynamic_cast<DQ_FreeFlyingRobotDynamics*>(my_chain.at(0).get());
+    DQ_FreeFlyingRobotDynamics* floating_base_prt;
+    floating_base_prt = dynamic_cast<DQ_FreeFlyingRobotDynamics*>(
+        my_chain.at(0).get());
     int start_from = 0;
-    if (ff_prt){ // the base is a free-flying robot
+    if (floating_base_prt){ // the base is a free-flying robot
         std::cout << "Updating dynamic parameters of the root subsystem..."
                   << std::endl;
 
