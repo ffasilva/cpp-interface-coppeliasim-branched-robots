@@ -56,11 +56,15 @@ DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters()
     MatrixXd inertia_tensor =
         this->_get_interface_sptr()->get_inertia_matrix(this->base_frame_name_);
 
-    const double joint_armature =
-        this->_get_interface_sptr()->get_mujoco_joint_armature(
-            this->base_frame_name_);
-    if (joint_armature != 0){
-        inertia_tensor = inertia_tensor + pow(joint_armature,2.)*inertia_tensor;
+    // Check if the simulation is using the MuJoCo engine and include
+    // the effects of joint armature in the link's inertia
+    if (this->_get_interface_sptr()->get_engine() == "MUJOCO"){
+        const double joint_armature =
+            this->_get_interface_sptr()->get_mujoco_joint_armature(
+                this->base_frame_name_);
+        if (joint_armature != 0){
+            inertia_tensor = inertia_tensor + pow(joint_armature,2.)*inertia_tensor;
+        }
     }
 
     std::vector<Matrix3d> inertia_tensors{inertia_tensor};
@@ -115,12 +119,16 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
         Matrix3d inertia_tensor_ith_link =
             (Rcm_in_0.transpose())*inertia_tensor_in_0*Rcm_in_0;
 
-        const double joint_armature =
-            this->_get_interface_sptr()->get_mujoco_joint_armature(
-                jointnames_.at(name_index));
-        if (joint_armature != 0){
-            inertia_tensor_ith_link = inertia_tensor_ith_link +
-                                      pow(joint_armature,2.)*inertia_tensor_ith_link;
+        // Check if the simulation is using the MuJoCo engine and include
+        // the effects of joint armature in the link's inertia
+        if (this->_get_interface_sptr()->get_engine() == "MUJOCO"){
+            const double joint_armature =
+                this->_get_interface_sptr()->get_mujoco_joint_armature(
+                    jointnames_.at(name_index));
+            if (joint_armature != 0){
+                inertia_tensor_ith_link = inertia_tensor_ith_link +
+                    pow(joint_armature,2.)*inertia_tensor_ith_link;
+            }
         }
 
         inertia_tensors.push_back(inertia_tensor_ith_link);
