@@ -18,8 +18,6 @@ This file is part of DQ Dynamics.
 
 Contributors to this file:
     Frederico Fernandes Afonso Silva - frederico.silva@ieee.org
-        - Adapted from DQ Robotic's LBR4pVrepRobot class.
-            https://github.com/dqrobotics/cpp-interface-vrep/blob/master/src/dqrobotics/interfaces/vrep/robots/LBR4pVrepRobot.cpp
 */
 
 #include <dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.h>

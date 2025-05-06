@@ -18,8 +18,6 @@ This file is part of DQ Dynamics.
 
 Contributors to this file:
     Frederico Fernandes Afonso Silva - frederico.silva@ieee.org
-        - Adapted from DQ Robotic's LBR4pVrepRobot class.
-            https://github.com/dqrobotics/cpp-interface-vrep/blob/master/include/dqrobotics/interfaces/vrep/robots/LBR4pVrepRobot.h
 */
 
 #pragma once
