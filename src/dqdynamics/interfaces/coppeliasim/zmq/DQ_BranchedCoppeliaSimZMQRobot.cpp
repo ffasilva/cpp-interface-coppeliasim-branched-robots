@@ -23,6 +23,7 @@ Contributors to this file:
 #include <dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.h>
 
 #include <dqdynamics/DQ_Extended.h>
+#include <dqdynamics/robots/FreeFlyingRobotDynamics.h>
 #include <dqdynamics/utils/DQ_Conversions.h>
 
 namespace DQ_dynamics
@@ -183,19 +184,31 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_dynamic_parameters(
     DQ_BranchedWholeBody &robot_dynamics,
     const int &starting_name_index)
 {
-    int chain_size = robot_dynamics.get_chain().size();
-
-    int name_index = starting_name_index;
     std::vector<std::shared_ptr<DQ_Dynamics>> my_chain =
         robot_dynamics.get_chain();
-    for (int i=0; i<chain_size; i++){
+
+    DQ_FreeFlyingRobotDynamics* ff_prt;
+    ff_prt = dynamic_cast<DQ_FreeFlyingRobotDynamics*>(my_chain.at(0).get());
+    int start_from = 0;
+    if (ff_prt){ // the base is a free-flying robot
+        std::cout << "Updating dynamic parameters of the root subsystem..."
+                  << std::endl;
+
+        this->update_base_dynamic_parameters(*my_chain.at(0));
+
+        start_from = 1;
+    }
+
+    int chain_size = robot_dynamics.get_chain().size();
+    int name_index = starting_name_index;
+    for (int i=start_from; i<chain_size; i++){
         std::cout << "Updating dynamic parameters of subsystem "
                   << i+1 << "..." << std::endl;
 
         this->update_branch_dynamic_parameters(*my_chain.at(i), name_index);
 
         name_index = name_index +
-            my_chain.at(i)->get_configuration_space_positions().size();
+                     my_chain.at(i)->get_configuration_space_positions().size();
     }
     std::cout << std::endl;
 }
