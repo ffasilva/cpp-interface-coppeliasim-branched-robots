@@ -34,15 +34,16 @@ namespace DQ_dynamics
  *
  * @param robot_name The name of robot used on the CoppeliaSim scene.
  * @param vrep_interface_sptr The DQ_VrepInterface smart pointer.
+ * @return A FreeFlyingCoppeliaSimZMQRobot object representing the
+ *         free-flying robot in the CoppeliaSim scene.
  *
  *  Example:
  *          auto vi = std::make_shared<DQ_CoppeliaSimInterfaceZMQExperimental>();
  *          vi->connect();
  *          vi->start_simulation();
- *          vi->load_from_model_browser("/robots/non-mobile/KUKA LBR4+.ttm",
- *                                      "/LBR4p");
- *          FreeFlyingCoppeliaSimZMQRobot lbr4p_coppeliasim_robot("/LBR4p", vi);
- *          auto q = lbr4p_coppeliasim_robot.get_joint_positions();
+ *          FreeFlyingCoppeliaSimZMQRobot free_flying_coppeliasim_robot(
+ *              "/free_flying",
+ *              vi);
  *          vi->stop_simulation();
  */
 FreeFlyingCoppeliaSimZMQRobot::FreeFlyingCoppeliaSimZMQRobot(
@@ -63,13 +64,6 @@ FreeFlyingCoppeliaSimZMQRobot::FreeFlyingCoppeliaSimZMQRobot(
     // Fix base frame name automatically assigned by the
     // DQ_CoppeliaSimRobotZMQ class
     base_frame_name_ = "/free_flying/free_flying_base";
-
-    // Fix the joint names automatically assigned by the
-    // DQ_CoppeliaSimRobotZMQ class. This property is used for
-    // compatibility with the
-    // DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters()
-    // method
-    link_names_.at(0) = base_frame_name_;
 
     // Set the name of the robot's force sensor
     force_sensor_name_ = "/free_flying/force_sensor";
@@ -229,7 +223,7 @@ DQ_FreeFlyingRobotDynamics FreeFlyingCoppeliaSimZMQRobot::dynamics()
     dyn.set_base_frame(base_frame);
 
     // Update dynamic parameters with CoppeliaSim information
-    this->update_branch_dynamic_parameters(dyn, 0);
+    this->update_base_dynamic_parameters(dyn);
 
     return dyn;
 }
