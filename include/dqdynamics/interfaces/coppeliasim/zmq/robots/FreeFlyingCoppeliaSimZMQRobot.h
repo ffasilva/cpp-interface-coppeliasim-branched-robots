@@ -40,15 +40,10 @@ public:
                                       vrep_interface_sptr);
     virtual ~FreeFlyingCoppeliaSimZMQRobot() = default;
 
-    // void set_configuration_space(const VectorXd& q) override;
     VectorXd get_configuration_space() override;
 
-    // void set_target_configuration_space(const VectorXd& q_target) override;
-
     VectorXd get_configuration_space_velocities() override;
-    // void set_target_configuration_space_velocities(const VectorXd& v_target) override;
 
-    // void set_configuration_space_torques(const VectorXd& t) override;
     VectorXd get_configuration_space_torques() override;
 
     DQ_FreeFlyingRobotDynamics dynamics();
