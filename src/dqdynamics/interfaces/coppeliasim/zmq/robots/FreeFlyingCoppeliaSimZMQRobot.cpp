@@ -94,7 +94,8 @@ VectorXd FreeFlyingCoppeliaSimZMQRobot::get_configuration_space()
 {
     // Read the robot's pose from CoppeliaSim
     const auto coppeliasim_sptr = this->_get_interface_sptr();
-    DQ_robotics::DQ x = coppeliasim_sptr->get_object_pose(base_frame_name_);
+    DQ_robotics::DQ x = DQ_robotics::normalize(
+        coppeliasim_sptr->get_object_pose(base_frame_name_));
 
     // Vectorizes the pose for compatibility with other classes that rely
     // on calls to get_configuration_space() in which the return is a
@@ -217,8 +218,8 @@ DQ_FreeFlyingRobotDynamics FreeFlyingCoppeliaSimZMQRobot::dynamics()
     dyn.set_configurations(q_read, dq_read, ddq_read);
 
     // Update base and reference frame with CoppeliaSim values
-    const DQ& base_frame = this->_get_interface_sptr()->get_object_pose(
-        this->base_frame_name_);
+    const DQ_robotics::DQ& base_frame = DQ_robotics::normalize(
+        this->_get_interface_sptr()->get_object_pose(this->base_frame_name_));
     dyn.set_reference_frame(base_frame);
     dyn.set_base_frame(base_frame);
 
