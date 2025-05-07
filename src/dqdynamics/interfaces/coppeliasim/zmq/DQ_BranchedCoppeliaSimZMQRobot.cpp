@@ -58,18 +58,6 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_base_dynamic_parameters(
     MatrixXd inertia_tensor =
         this->_get_interface_sptr()->get_inertia_matrix(this->base_frame_name_,
             DQ_CoppeliaSimInterfaceZMQExperimental::REFERENCE::BODY_FRAME);
-
-    // Check if the simulation is using the MuJoCo engine and include
-    // the effects of joint armature in the link's inertia
-    if (this->_get_interface_sptr()->get_engine() == "MUJOCO"){
-        const double joint_armature =
-            this->_get_interface_sptr()->get_mujoco_joint_armature(
-                this->base_frame_name_);
-        if (joint_armature != 0){
-            inertia_tensor = inertia_tensor + pow(joint_armature,2.)*inertia_tensor;
-        }
-    }
-
     std::vector<Matrix3d> inertia_tensors{inertia_tensor};
 
     robot_dynamics.set_masses(masses);
