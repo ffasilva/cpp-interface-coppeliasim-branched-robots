@@ -40,6 +40,12 @@ public:
             vrep_interface_sptr);
     virtual ~B1CoppeliaSimZMQRobot() = default;
 
+    VectorXd get_joint_positions();
+
+    VectorXd get_configuration_space() override;
+    VectorXd get_configuration_space_velocities() override;
+    // VectorXd get_configuration_space_torques() override;
+
     DQ_BranchedWholeBody dynamics();
 };
 
