@@ -51,10 +51,12 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
     src/dqdynamics/interfaces/coppeliasim/zmq/DQ_BranchedCoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/B1LegCoppeliaSimZMQ.cpp
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/HexapodLegCoppeliaSimZMQ.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/B1CoppeliaSimZMQRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/HexapodCoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/utils/math.cpp
@@ -104,10 +106,12 @@ INSTALL(FILES
 # ZMQ robots headers
 INSTALL(FILES
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/B1LegCoppeliaSimZMQ.h
+    include/dqdynamics/interfaces/coppeliasim/zmq/robots/HexapodLegCoppeliaSimZMQ.h
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.h
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.h
 
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/B1CoppeliaSimZMQRobot.h
+    include/dqdynamics/interfaces/coppeliasim/zmq/robots/HexapodCoppeliaSimZMQRobot.h
     include/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.h
 
     DESTINATION "include/dqdynamics/interfaces/coppeliasim/zmq/robots")
@@ -144,10 +148,12 @@ INSTALL(FILES
 # ZMQ robots folder
 INSTALL(FILES
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/B1LegCoppeliaSimZMQ.cpp
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/HexapodLegCoppeliaSimZMQ.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/LBR4pCoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/FreeFlyingCoppeliaSimZMQRobot.cpp
 
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/B1CoppeliaSimZMQRobot.cpp
+    src/dqdynamics/interfaces/coppeliasim/zmq/robots/HexapodCoppeliaSimZMQRobot.cpp
     src/dqdynamics/interfaces/coppeliasim/zmq/robots/BM_TRO2023CoppeliaSimZMQRobot.cpp
 
     DESTINATION "src/dqdynamics/interfaces/coppeliasim/zmq/robots")
