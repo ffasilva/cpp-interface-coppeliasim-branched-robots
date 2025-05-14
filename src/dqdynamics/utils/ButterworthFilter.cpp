@@ -59,6 +59,12 @@ std::vector<std::complex<double>> ButterworthFilter::_poly(
     return result;
 }
 
+/**
+ * @brief Sums the coefficients of a given vector.
+ * @param vector A vector of complex numbers.
+ * @return A complex number representing the sum of the coefficients of
+ *         the given vector.
+ */
 std::complex<double> ButterworthFilter::_sum(
     const std::vector<std::complex<double>>& vector)
 {
@@ -158,6 +164,37 @@ std::tuple<std::vector<double>, std::vector<double>>
 ButterworthFilter::get_butterworth_coefficients()
 {
     return std::make_tuple(coeff_a_, coeff_b_);
+}
+
+/**
+ * @brief Returns the coefficients of a Butterworth filter for the
+ *        specification given in the creation of the ButterworthFilter
+ *        object.
+ * @param filter_order An integer representing the order of the IIR filter.
+ * @return The coefficients of a Butterworth filter for the specification
+ *         given in the creation of the ButterworthFilter object.
+ */
+VectorXd ButterworthFilter::filter(const VectorXd& signal)
+{
+    const int n = signal.size();
+    filtered_signal = VectorXd::Zero(n);
+    const int m = coeff_b_.size();
+    for (int i=0; i<n; i++){
+        for (int j=0; j<m; j++){
+            if ((i-j) >= 0){
+                filtered_signal(i) = filtered_signal(i) +
+                                     coeff_b_.at(j)*signal(i-j);
+                if (((i-(j+1)) >= 0) && (j < (m - 1))){
+                    filtered_signal(i) = filtered_signal(i) -
+                                         coeff_a_.at(j+1)*filtered_signal(i-(j+1));
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    return filtered_signal;
 }
 
 /****************************************************************

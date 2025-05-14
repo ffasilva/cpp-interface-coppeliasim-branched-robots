@@ -22,15 +22,20 @@ Contributors to this file:
             https://thecodehound.com/butterworth-filter-design-in-c/
 */
 
-
-
 #pragma once
 
 #include <complex>
 #include <vector>
 #include <tuple>
 
+#ifdef _WIN32
+#include <Eigen/Dense>
+#else
+#include <eigen3/Eigen/Dense>
+#endif
+
 using namespace std::literals::complex_literals;
+using namespace Eigen;
 
 using Polynomial = std::vector<std::complex<double>>;
 
@@ -43,6 +48,8 @@ private:
     int filter_order_;
     double sampling_frequency_, cutoff_frequency_;
     std::vector<double> coeff_a_, coeff_b_;
+
+    VectorXd filtered_signal;
 
     static std::vector<std::complex<double>> _poly(
         std::vector<std::complex<double>> roots);
@@ -60,6 +67,8 @@ public:
 
     std::tuple<std::vector<double>, std::vector<double>>
     get_butterworth_coefficients();
+
+    VectorXd filter(const VectorXd& signal);
 };
 
 /****************************************************************
