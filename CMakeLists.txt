@@ -6,7 +6,7 @@ if(WIN32)
 endif()
 
 project(dqdynamics-interface-coppeliasim)
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 
 INCLUDE_DIRECTORIES(include)
 
@@ -61,7 +61,8 @@ ADD_LIBRARY(dqdynamics-interface-coppeliasim SHARED
 
     src/dqdynamics/utils/math.cpp
     src/dqdynamics/utils/NumericalDifferentiation.cpp
-    )
+    src/dqdynamics/utils/ButterworthFilter.cpp
+)
 
 # Links with required libraries
 if(UNIX)
@@ -120,6 +121,7 @@ INSTALL(FILES
 INSTALL(FILES
     include/dqdynamics/utils/math.h
     include/dqdynamics/utils/NumericalDifferentiation.h
+    include/dqdynamics/utils/ButterworthFilter.h
 
     DESTINATION "include/dqdynamics/utils")
 
@@ -162,5 +164,6 @@ INSTALL(FILES
 INSTALL(FILES
     src/dqdynamics/utils/math.cpp
     src/dqdynamics/utils/NumericalDifferentiation.cpp
+    src/dqdynamics/utils/ButterworthFilter.cpp
 
     DESTINATION "src/dqdynamics/utils")
