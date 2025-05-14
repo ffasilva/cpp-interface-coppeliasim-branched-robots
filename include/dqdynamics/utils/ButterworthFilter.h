@@ -44,11 +44,13 @@ private:
     double sampling_frequency_, cutoff_frequency_;
     std::vector<double> coeff_a_, coeff_b_;
 
-    static std::vector<std::complex<double>> poly(
+    static std::vector<std::complex<double>> _poly(
         std::vector<std::complex<double>> roots);
 
     static std::complex<double>
-    sum(const std::vector<std::complex<double>>& vector);
+    _sum(const std::vector<std::complex<double>>& vector);
+
+    void _calculate_butterworth_coefficients();
 public:
     ButterworthFilter() = delete;
     ButterworthFilter(const int& filter_order,

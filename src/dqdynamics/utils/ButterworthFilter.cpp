@@ -44,7 +44,7 @@ namespace DQ_dynamics
  * @return A vector with complex elements representing the coefficients
  *         of the polynomial with the specified roots.
  */
-std::vector<std::complex<double>> ButterworthFilter::poly(
+std::vector<std::complex<double>> ButterworthFilter::_poly(
     std::vector<std::complex<double>> roots)
 {
     Polynomial result{1.0};
@@ -59,10 +59,68 @@ std::vector<std::complex<double>> ButterworthFilter::poly(
     return result;
 }
 
-std::complex<double> ButterworthFilter::sum(
+std::complex<double> ButterworthFilter::_sum(
     const std::vector<std::complex<double>>& vector)
 {
     return std::accumulate(vector.begin(), vector.end(), 0.0i);
+}
+
+/**
+ * @brief Calculates the coefficients of a Butterworth filter for the
+ *        specification given in the creation of the ButterworthFilter
+ *        object. This method is an adaptation of Tom's conversion to
+ *        to C++ of Neil Robertson's MATLAB original implementation:
+ *          https://www.dsprelated.com/showarticle/1119.php
+ * @return The coefficients of a Butterworth filter for the specification
+ *         given in the creation of the ButterworthFilter object.
+ */
+void ButterworthFilter::_calculate_butterworth_coefficients()
+{
+    const int& N = filter_order_;
+    std::vector<std::complex<double>> pa(N);
+    std::vector<std::complex<double>> p(N);
+    std::vector<std::complex<double>> q(N, -1.0);
+
+    const double& fc = cutoff_frequency_;
+    const double& fs = sampling_frequency_;
+    assert(fc < fs / 2); // Cutoff frequency must be less that fs/2
+
+    // I. Find poles of analog filter
+    const double& pi = M_PI;
+    for (int i = 0; i < N; i++){
+        int k = i + 1;
+        double theta = (2*k - 1)*pi/(2*N);
+        pa[i] = -sin(theta) + 1.0i * cos(theta);
+    }
+
+    // II. Scale poles in frequency
+    const double Fc = fs/pi*tan(pi*fc/fs);
+    for (size_t i=0; i<pa.size(); i++){
+        pa[i] *= 2*pi*Fc;
+    }
+
+    // III. Find coeffs of digital filter poles and zeros in the z plane
+    for (int i = 0; i < N; i++){
+        p[i] = (1.0 + pa[i]/(2*fs))/(1.0 - pa[i]/(2*fs));
+    }
+
+    auto a = this->_poly(p);
+    for (size_t i = 0; i < a.size(); i++){
+        a[i] = a[i].real();
+    }
+
+    auto b = this->_poly(q);
+    const auto K = this->_sum(a)/this->_sum(b);
+    for (size_t i = 0; i < b.size(); i++){
+        b[i] *= K;
+    }
+
+    for (auto coeff : a){
+        coeff_a_.push_back(coeff.real());
+    }
+    for (auto coeff : b){
+        coeff_b_.push_back(coeff.real());
+    }
 }
 
 /****************************************************************
@@ -85,62 +143,21 @@ ButterworthFilter::ButterworthFilter(const int& filter_order,
     filter_order_ = filter_order;
     cutoff_frequency_ = cutoff_frequency;
     sampling_frequency_ = 1.0/sampling_time;
+
+    this->_calculate_butterworth_coefficients();
 }
 
 /**
- * @brief Calculates the coefficients of a Butterworth filter for the
+ * @brief Returns the coefficients of a Butterworth filter for the
  *        specification given in the creation of the ButterworthFilter
- *        object. This method is an adaptation of Tom's conversion to
- *        to C++ of Neil Robertson's MATLAB original implementation:
- *          https://www.dsprelated.com/showarticle/1119.php
+ *        object.
  * @return The coefficients of a Butterworth filter for the specification
  *         given in the creation of the ButterworthFilter object.
  */
 std::tuple<std::vector<double>, std::vector<double>>
 ButterworthFilter::get_butterworth_coefficients()
 {
-    const int& N = filter_order_;
-    std::vector<std::complex<double>> pa(N);
-    std::vector<std::complex<double>> p(N);
-    std::vector<std::complex<double>> q(N, -1.0);
-
-    const double& fc = cutoff_frequency_;
-    const double& fs = sampling_frequency_;
-    assert(fc < fs / 2); // Cutoff frequency must be less that fs/2
-
-    // I. Find poles of analog filter
-    const double& pi = M_PI;
-    for (int i = 0; i < N; i++)
-    {
-        int k = i + 1;
-        double theta = (2 * k - 1) * pi / (2 * N);
-        pa[i] = -sin(theta) + 1.0i * cos(theta);
-    }
-
-    // II. Scale poles in frequency
-    double Fc = fs / pi * tan(pi * fc / fs);
-    for (size_t i=0; i<pa.size(); i++)
-        pa[i] *= 2 * pi * Fc;
-
-    // III. Find coeffs of digital filter poles and zeros in the z plane
-    for (int i = 0; i < N; i++)
-        p[i] = (1.0 + pa[i] / (2 * fs)) / (1.0 - pa[i] / (2 * fs));
-
-    auto a = poly(p);
-    for (size_t i = 0; i < a.size(); i++)
-        a[i] = a[i].real();
-
-    auto b = poly(q);
-    auto K = sum(a) / sum(b);
-    for (size_t i = 0; i < b.size(); i++)
-        b[i] *= K;
-
-    for (auto coeff : a)
-        coeff_a_.push_back(coeff.real());
-    for (auto coeff : b)
-        coeff_b_.push_back(coeff.real());
-
-    return std::make_tuple(coeff_a_, coeff_b_);;
+    return std::make_tuple(coeff_a_, coeff_b_);
 }
 
 /****************************************************************
@@ -155,11 +172,14 @@ ButterworthFilter::get_butterworth_coefficients()
  */
 Polynomial operator*(const Polynomial& p, const Polynomial& q)
 {
-    size_t n = p.size() + q.size() - 1;
+    const size_t n = p.size() + q.size() - 1;
     Polynomial result(n);
-    for (size_t i = 0; i < p.size(); i++)
-        for (size_t j = 0; j < q.size(); j++)
-            result[i + j] += p[i] * q[j];
+    for (size_t i = 0; i < p.size(); i++){
+        for (size_t j = 0; j < q.size(); j++){
+            result[i + j] += p[i]*q[j];
+        }
+    }
+
     return result;
 }
 
