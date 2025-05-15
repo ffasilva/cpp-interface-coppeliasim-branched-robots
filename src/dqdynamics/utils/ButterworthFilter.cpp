@@ -38,7 +38,7 @@ namespace DQ_dynamics
 
 /**
  * @brief Calculates the coefficients of the polynomial with the specified
- *        roots. Emulate Matlab 'poly' function.
+ *        roots. Emulate Matlab 'poly()' function.
  * @param roots A vector with complex elements representing the roots of
  *        the polynomial.
  * @return A vector with complex elements representing the coefficients
@@ -63,7 +63,7 @@ std::vector<std::complex<double>> ButterworthFilter::_poly(
  * @brief Sums the coefficients of a given vector.
  * @param vector A vector of complex numbers.
  * @return A complex number representing the sum of the coefficients of
- *         the given vector.
+ *         the given vector. Emulate Matlab 'sum()' function.
  */
 std::complex<double> ButterworthFilter::_sum(
     const std::vector<std::complex<double>>& vector)
@@ -77,6 +77,7 @@ std::complex<double> ButterworthFilter::_sum(
  *        object. This method is an adaptation of Tom's conversion to
  *        to C++ of Neil Robertson's MATLAB original implementation:
  *          https://www.dsprelated.com/showarticle/1119.php
+ *        Reduce, Reuse, and Recycle!
  * @return The coefficients of a Butterworth filter for the specification
  *         given in the creation of the ButterworthFilter object.
  */
@@ -89,7 +90,7 @@ void ButterworthFilter::_calculate_butterworth_coefficients()
 
     const double& fc = cutoff_frequency_;
     const double& fs = sampling_frequency_;
-    assert(fc < fs / 2); // Cutoff frequency must be less that fs/2
+    assert(fc < fs / 2); // cutoff frequency must be less that fs/2
 
     // I. Find poles of analog filter
     const double& pi = M_PI;
@@ -167,24 +168,29 @@ ButterworthFilter::get_butterworth_coefficients()
 }
 
 /**
- * @brief Returns the coefficients of a Butterworth filter for the
- *        specification given in the creation of the ButterworthFilter
- *        object.
- * @param filter_order An integer representing the order of the IIR filter.
- * @return The coefficients of a Butterworth filter for the specification
- *         given in the creation of the ButterworthFilter object.
+ * @brief Filters a given signal using the Butterworth filter specified
+ *        in the ButterworthFilter object creation.
+ * @param signal A vector of doubles with elements representing samples
+ *        of a signal.
+ * @return The signal filtered by a Butterworth filter specified in the
+ *         ButterworthFilter object creation.
  */
 VectorXd ButterworthFilter::filter(const VectorXd& signal)
 {
     const int n = signal.size();
-    filtered_signal = VectorXd::Zero(n);
     const int m = coeff_b_.size();
+    // For an input signal x with n samples and a Butterworth filter of order m,
+    // calculate the i-th element of the output signal y as:
+    // y[i] = b0*x[i] + b1*x[i-1] + ... + bm*x[i-m] - a1*y[i-1] - ... - -am*y[i-m]
+    filtered_signal = VectorXd::Zero(n);
     for (int i=0; i<n; i++){
         for (int j=0; j<m; j++){
             if ((i-j) >= 0){
+                // y[i] = b0*x[i] + b1*x[i-1] + ... + bm*x[i-m]
                 filtered_signal(i) = filtered_signal(i) +
                                      coeff_b_.at(j)*signal(i-j);
                 if (((i-(j+1)) >= 0) && (j < (m - 1))){
+                    // y[i] = -a1*y[i-1] - a2*y[i-2] - ... - -am*y[i-m]
                     filtered_signal(i) = filtered_signal(i) -
                                          coeff_a_.at(j+1)*filtered_signal(i-(j+1));
                 }
