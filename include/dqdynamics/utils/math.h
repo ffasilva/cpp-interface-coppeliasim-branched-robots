@@ -38,6 +38,7 @@ namespace DQ_dynamics
 *****************************************************************/
 
 double cmc (const VectorXd& waveform1, const VectorXd& waveform2);
+double rmse(const VectorXd& waveform1, const VectorXd& waveform2);
 double variance(const VectorXd& q);
 
 }//namespace DQ_dynamics

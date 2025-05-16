@@ -75,6 +75,33 @@ double cmc(const VectorXd& waveform1, const VectorXd& waveform2)
 }
 
 /**
+ * @brief Returns the root-mean-square error between between two curves
+ *        of same length.
+ * @param waveform1 A VectorXd vector with data from the first waveform.
+ * @param waveform2 A VectorXd vector with data from the second waveform.
+ * @return The root-mean-square error between two curves.
+ */
+double rmse(const VectorXd& waveform1, const VectorXd& waveform2)
+{
+    // Check if the waveforms have the same size
+    int n = waveform1.size();
+    int m = waveform2.size();
+    if (n != m){
+        throw std::runtime_error("The waveforms should be of the same "
+                                 "size!");
+    }
+
+    // Calculate the RMSE between the waveforms
+    double ret = 0.;
+    for (int i=0; i<n; i++){
+        ret = ret + pow((waveform1(i) - waveform2(i)), 2);
+    }
+    ret = sqrt((1./n)*ret);
+
+    return ret;
+}
+
+/**
  * @brief Returns the variance of the elements of a vector.
  * @param q A VectorXd with double elements.
  * @return The variance of the elements of the input vector.
