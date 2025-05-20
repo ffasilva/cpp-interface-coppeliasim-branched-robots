@@ -58,14 +58,9 @@ public:
         const DQ_CoppeliaSimInterfaceZMQExperimental::JOINT_MODE& joint_mode,
         const DQ_CoppeliaSimInterfaceZMQExperimental::JOINT_CONTROL_MODE& joint_control_mode);
 
-    void set_joint_armatures(const int& joint_armatures);
-    // void set_joint_armatures(const std::vector<int>& joint_armatures);
-
+    void set_joint_armatures(const double& joint_armatures);
     void set_joint_dampings(const int& joint_dampings);
-    // void set_joint_dampings(const std::vector<int>& joint_dampings);
-
     void set_link_frictions(const std::vector<double>& link_frictions);
-    // void set_link_frictions(const std::vector<std::vector<double>>& body_frictions);
 };
 
 }//namespace DQ_dynamics

@@ -83,6 +83,7 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
     VectorXd masses = VectorXd::Zero(num_bodies, 1);
     VectorXdq position_CoMs = VectorXdq::Zero(num_bodies, 1);
     std::vector<Matrix3d> inertia_tensors;
+    VectorXd joint_armatures = VectorXd::Zero(num_bodies, 1);
 
     int name_index = starting_name_index;
     VectorXd q_read = robot_dynamics.get_configuration_space_positions();
@@ -113,15 +114,11 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
             (Rcm_in_0.transpose())*inertia_tensor_in_0*Rcm_in_0;
 
         // Check if the simulation is using the MuJoCo engine and include
-        // the effects of joint armature in the link's inertia
+        // the effects of joint armature
         if (this->_get_interface_sptr()->get_engine() == "MUJOCO"){
-            const double joint_armature =
+            joint_armatures(i) =
                 this->_get_interface_sptr()->get_mujoco_joint_armature(
                     jointnames_.at(name_index));
-            if (joint_armature != 0){
-                inertia_tensor_ith_link = inertia_tensor_ith_link +
-                    pow(joint_armature,2.)*inertia_tensor_ith_link;
-            }
         }
 
         inertia_tensors.push_back(inertia_tensor_ith_link);
@@ -133,6 +130,7 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
     robot_dynamics.set_masses(masses);
     robot_dynamics.set_position_CoMs(position_CoMs);
     robot_dynamics.set_inertia_tensors(inertia_tensors);
+    robot_dynamics.set_joint_armature(joint_armatures);
 }
 
 /**
@@ -249,19 +247,20 @@ void DQ_BranchedCoppeliaSimZMQRobot::set_joint_operation_modes(
 }
 
 /**
- * @brief Sets the joint armatures. This results in the effect known as
- *        “reflected inertia,” which is equivalent to multiplying the inertia
- *        tensor of the body actuated by the joint by the square of the joint
- *        armature. For instance, if the body actuated by a joint has inertia
- *        tensor I, setting the joint armature to x is equivalent to setting
- *        the inertia tensor of the body to I + (x^2)*I. This parameter only
- *        applies to the MuJoCo engine. For more details, refer to:
+ * @brief Sets the joint armatures, which results in the effect known as
+ *        “reflected inertia.” For the inverse dynamic modeling, this is
+ *        equivalent to adding a torque to the joint which is proportional to
+ *        the joint armature and acceleration, that is:
+ *          tau[i] = tau[i] + joint_armatures_[i]*ddq[i]; *
+ *        This parameter only applies to the MuJoCo engine. For more details,
+ *        refer to:
  *          https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-joint-armature
  *
  * @param joint_armatures An integer representing additional inertia associated
  *        with movement of the joint that is not due to body mass.
  */
-void DQ_BranchedCoppeliaSimZMQRobot::set_joint_armatures(const int& joint_armatures)
+void DQ_BranchedCoppeliaSimZMQRobot::set_joint_armatures(
+    const double &joint_armatures)
 {
     // Check if the simulation is using the MuJoCo engine
     if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
