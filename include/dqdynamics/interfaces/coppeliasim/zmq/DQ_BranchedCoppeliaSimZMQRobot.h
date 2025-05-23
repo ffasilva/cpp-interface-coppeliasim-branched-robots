@@ -38,6 +38,7 @@ class DQ_BranchedCoppeliaSimZMQRobot: public DQ_robotics::DQ_CoppeliaSimRobotZMQ
 {
 protected:
     std::vector<std::string> link_names_;
+    VectorXd joint_armatures_;
 
     void update_base_dynamic_parameters(DQ_Dynamics& robot_dynamics);
     void update_branch_dynamic_parameters(DQ_Dynamics& robot_dynamics,
@@ -61,6 +62,9 @@ public:
     void set_joint_armatures(const double& joint_armatures);
     void set_joint_dampings(const int& joint_dampings);
     void set_link_frictions(const std::vector<double>& link_frictions);
+
+    VectorXd remove_joint_armature_effects(const VectorXd& tau,
+                                           const VectorXd& ddq);
 };
 
 }//namespace DQ_dynamics

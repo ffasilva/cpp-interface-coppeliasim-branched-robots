@@ -83,7 +83,6 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
     VectorXd masses = VectorXd::Zero(num_bodies, 1);
     VectorXdq position_CoMs = VectorXdq::Zero(num_bodies, 1);
     std::vector<Matrix3d> inertia_tensors;
-    VectorXd joint_armatures = VectorXd::Zero(num_bodies, 1);
 
     int name_index = starting_name_index;
     VectorXd q_read = robot_dynamics.get_configuration_space_positions();
@@ -116,7 +115,7 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
         // Check if the simulation is using the MuJoCo engine and include
         // the effects of joint armature
         if (this->_get_interface_sptr()->get_engine() == "MUJOCO"){
-            joint_armatures(i) =
+            joint_armatures_(name_index) =
                 this->_get_interface_sptr()->get_mujoco_joint_armature(
                     jointnames_.at(name_index));
         }
@@ -130,7 +129,6 @@ void DQ_BranchedCoppeliaSimZMQRobot::update_branch_dynamic_parameters(
     robot_dynamics.set_masses(masses);
     robot_dynamics.set_position_CoMs(position_CoMs);
     robot_dynamics.set_inertia_tensors(inertia_tensors);
-    robot_dynamics.set_joint_armature(joint_armatures);
 }
 
 /**
@@ -220,6 +218,11 @@ DQ_BranchedCoppeliaSimZMQRobot::DQ_BranchedCoppeliaSimZMQRobot(
     link_names_ = this->_get_interface_sptr()->
                   get_shapenames_from_parent_object(robot_name,
                     DQ_CoppeliaSimInterfaceZMQExperimental::SHAPE_TYPE::DYNAMIC);
+
+    // Initialize joint armatures (only applicable to MuJoCo)
+    if (this->_get_interface_sptr()->get_engine() == "MUJOCO"){
+        joint_armatures_ = VectorXd::Zero(jointnames_.size());
+    }
 }
 
 /**
@@ -264,7 +267,8 @@ void DQ_BranchedCoppeliaSimZMQRobot::set_joint_armatures(
 {
     // Check if the simulation is using the MuJoCo engine
     if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
-        throw std::runtime_error("This joint armatures only apply to the MuJoCo "
+        this->_get_interface_sptr()->stop_simulation();
+        throw std::runtime_error("Joint armatures only apply to the MuJoCo "
                                  "engine! Please change the engine of your "
                                  "simulation before using this method.");
     }
@@ -286,7 +290,8 @@ void DQ_BranchedCoppeliaSimZMQRobot::set_joint_dampings(const int& joint_damping
 {
     // Check if the simulation is using the MuJoCo engine
     if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
-        throw std::runtime_error("This joint armatures only apply to the MuJoCo "
+        this->_get_interface_sptr()->stop_simulation();
+        throw std::runtime_error("Joint dampings only apply to the MuJoCo "
                                  "engine! Please change the engine of your "
                                  "simulation before using this method.");
     }
@@ -313,7 +318,8 @@ void DQ_BranchedCoppeliaSimZMQRobot::set_link_frictions(
 {
     // Check if the simulation is using the MuJoCo engine
     if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
-        throw std::runtime_error("This joint armatures only apply to the MuJoCo "
+        this->_get_interface_sptr()->stop_simulation();
+        throw std::runtime_error("Link frictions only apply to the MuJoCo "
                                  "engine! Please change the engine of your "
                                  "simulation before using this method.");
     }
@@ -321,6 +327,35 @@ void DQ_BranchedCoppeliaSimZMQRobot::set_link_frictions(
     // Set the friction coefficients of all the links
     this->_get_interface_sptr()->set_mujoco_body_frictions(link_names_,
                                                            link_frictions);
+}
+
+VectorXd DQ_BranchedCoppeliaSimZMQRobot::remove_joint_armature_effects(
+    const VectorXd& tau,
+    const VectorXd& ddq)
+{
+    // Check if the simulation is using the MuJoCo engine
+    if (this->_get_interface_sptr()->get_engine() != "MUJOCO"){
+        this->_get_interface_sptr()->stop_simulation();
+        throw std::runtime_error("Joint armatures only apply to the MuJoCo "
+                                 "engine! Please change the engine of your "
+                                 "simulation before using this method.");
+    }
+
+    // Check size consistency
+    const int n = jointnames_.size();
+    if ((tau.size() != n) || (ddq.size() != n)){
+        this->_get_interface_sptr()->stop_simulation();
+        std::cerr << "Vectors of joint torque/forces and joint accelerations "
+                     "should be of size " << n << "." << std::endl;
+        throw std::runtime_error("Simulation stopped!");
+    }
+
+    VectorXd tau_without_ja_effects = VectorXd::Zero(n);
+    for (int i=0; i<n; i++){
+        tau_without_ja_effects(i) = tau(i) - joint_armatures_(i)*ddq(i);
+    }
+
+    return tau_without_ja_effects;
 }
 
 }//namespace DQ_dynamics
